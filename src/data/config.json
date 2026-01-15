@@ -1,0 +1,67 @@
+{
+  "version": "1.0.0",
+  "app": {
+    "name": "Écosystème Technologique IT",
+    "description": "Visualisation interactive de l'écosystème des technologies IT",
+    "copyright": "© 2026 Tous droits réservés",
+    "author": "Écosystème Tech"
+  },
+  "groupColors": {
+    "frontend": "#3B82F6",
+    "backend": "#10B981",
+    "database": "#F59E0B",
+    "conception_front": "#6366F1",
+    "conception_back": "#059669",
+    "conception_bdd": "#D97706",
+    "practices": "#7C3AED",
+    "devops": "#8B5CF6",
+    "security": "#DC2626",
+    "data": "#EC4899",
+    "architecture": "#06B6D4",
+    "methodo": "#6B7280",
+    "tools": "#EF4444",
+    "testing": "#14B8A6",
+    "design": "#F472B6"
+  },
+  "groupLabels": {
+    "frontend": "Frontend",
+    "backend": "Backend",
+    "database": "Base de données",
+    "conception_front": "Conception Front",
+    "conception_back": "Conception Back",
+    "conception_bdd": "Conception BDD",
+    "practices": "Bonnes Pratiques",
+    "devops": "DevOps & Cloud",
+    "security": "Cybersécurité",
+    "data": "Data & IA",
+    "architecture": "Architecture",
+    "methodo": "Méthodologie",
+    "tools": "Outils Dev",
+    "testing": "Testing",
+    "design": "Design"
+  },
+  "groupIcons": {
+    "frontend": "🎨",
+    "backend": "⚙️",
+    "database": "🗄️",
+    "conception_front": "📐",
+    "conception_back": "🏛️",
+    "conception_bdd": "📊",
+    "practices": "✅",
+    "devops": "☁️",
+    "security": "🔒",
+    "data": "📈",
+    "architecture": "🏗️",
+    "methodo": "📋",
+    "tools": "🛠️",
+    "testing": "🧪",
+    "design": "✨"
+  },
+  "visualization": {
+    "nodeRadius": 24,
+    "linkDistance": 100,
+    "chargeStrength": -300,
+    "collisionRadius": 40,
+    "zoomExtent": [0.2, 4]
+  }
+}
