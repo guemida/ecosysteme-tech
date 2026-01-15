@@ -1,0 +1,947 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎓 Écosystème Technologique IT</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            min-height: 100vh;
+        }
+        
+        .header {
+            background: white;
+            border-bottom: 1px solid #e2e8f0;
+            padding: 16px 24px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .header h1 { font-size: 1.5rem; color: #1e293b; }
+        .header p { color: #64748b; font-size: 0.875rem; margin-top: 4px; }
+        
+        .filters {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 16px;
+        }
+        .filter-btn {
+            padding: 6px 12px;
+            border-radius: 20px;
+            border: none;
+            font-size: 0.75rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: #f1f5f9;
+            color: #475569;
+        }
+        .filter-btn:hover { background: #e2e8f0; }
+        .filter-btn.active { background: #1e293b; color: white; }
+        
+        .search-box {
+            padding: 8px 16px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            width: 200px;
+            outline: none;
+        }
+        .search-box:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,0.1); }
+        
+        .main-container {
+            display: flex;
+            height: calc(100vh - 140px);
+        }
+        
+        .graph-container {
+            flex: 1;
+            position: relative;
+        }
+        
+        .sidebar {
+            width: 380px;
+            background: white;
+            border-left: 1px solid #e2e8f0;
+            overflow-y: auto;
+            padding: 20px;
+        }
+        
+        .node-card {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+        
+        .node-header {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+        
+        .node-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            color: white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        }
+        
+        .node-title { font-size: 1.25rem; font-weight: 700; color: #1e293b; }
+        .node-subtitle { font-size: 0.875rem; color: #64748b; }
+        
+        .category-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: white;
+            margin-bottom: 4px;
+        }
+        
+        .description-box {
+            background: white;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 12px;
+        }
+        .description-box h4 { font-size: 0.8rem; color: #475569; margin-bottom: 8px; }
+        .description-box p { font-size: 0.875rem; color: #334155; line-height: 1.6; }
+        
+        .meta-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+        .meta-item {
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .meta-item.blue { background: #eff6ff; }
+        .meta-item.green { background: #f0fdf4; }
+        .meta-item.purple { background: #faf5ff; }
+        .meta-label { font-size: 0.7rem; font-weight: 600; margin-bottom: 2px; }
+        .meta-value { font-size: 0.8rem; font-weight: 700; }
+        .meta-item.blue .meta-label { color: #3b82f6; }
+        .meta-item.blue .meta-value { color: #1e40af; }
+        .meta-item.green .meta-label { color: #22c55e; }
+        .meta-item.green .meta-value { color: #166534; }
+        .meta-item.purple .meta-label { color: #a855f7; }
+        .meta-item.purple .meta-value { color: #7e22ce; }
+        
+        .tags-section h4 { font-size: 0.8rem; color: #475569; margin-bottom: 8px; }
+        .tags-container { display: flex; flex-wrap: wrap; gap: 6px; }
+        .tag {
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            background: #f1f5f9;
+            color: #475569;
+        }
+        .tag.clickable {
+            cursor: pointer;
+            color: white;
+            transition: opacity 0.2s;
+        }
+        .tag.clickable:hover { opacity: 0.8; }
+        
+        .welcome-box {
+            background: linear-gradient(135deg, #eff6ff 0%, #eef2ff 100%);
+            border-radius: 12px;
+            padding: 24px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .welcome-box .icon { font-size: 2.5rem; margin-bottom: 12px; }
+        .welcome-box h3 { color: #1e293b; margin-bottom: 8px; }
+        .welcome-box p { color: #64748b; font-size: 0.875rem; }
+        
+        .legend-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .legend-item:hover { background: #f1f5f9; }
+        .legend-dot {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+        }
+        .legend-label { font-size: 0.8rem; color: #475569; }
+        
+        .tips-box {
+            background: #fffbeb;
+            border-radius: 12px;
+            padding: 16px;
+            margin-top: 20px;
+        }
+        .tips-box h4 { font-size: 0.875rem; color: #92400e; margin-bottom: 8px; }
+        .tips-box ul { list-style: none; }
+        .tips-box li { font-size: 0.8rem; color: #a16207; margin-bottom: 4px; }
+        
+        .stats-overlay {
+            position: absolute;
+            bottom: 16px;
+            left: 16px;
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(8px);
+            border-radius: 12px;
+            padding: 12px 16px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            display: flex;
+            gap: 24px;
+        }
+        .stat-item { text-align: center; }
+        .stat-value { font-size: 1.5rem; font-weight: 700; color: #1e293b; }
+        .stat-label { font-size: 0.7rem; color: #64748b; }
+        
+        svg { width: 100%; height: 100%; }
+        
+        @media (max-width: 1024px) {
+            .main-container { flex-direction: column; height: auto; }
+            .sidebar { width: 100%; max-height: 400px; }
+            .graph-container { height: 500px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+            <div>
+                <h1>🎓 Écosystème Technologique IT</h1>
+                <p>Cliquez pour explorer les connexions • Molette pour zoomer • Glissez pour déplacer</p>
+            </div>
+            <input type="text" class="search-box" placeholder="🔍 Rechercher..." id="searchInput">
+        </div>
+        <div class="filters" id="filterButtons"></div>
+    </div>
+    
+    <div class="main-container">
+        <div class="graph-container">
+            <svg id="graph"></svg>
+            <div class="stats-overlay">
+                <div class="stat-item">
+                    <div class="stat-value" id="nodeCount">0</div>
+                    <div class="stat-label">Technologies</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="linkCount">0</div>
+                    <div class="stat-label">Connexions</div>
+                </div>
+            </div>
+        </div>
+        <div class="sidebar" id="sidebar"></div>
+    </div>
+
+    <script>
+        // Data
+        const techData = {
+            nodes: [
+                // ==================== FRONTEND ====================
+                { id: 'HTML', group: 'frontend', shortDesc: 'Structure des pages web', fullDesc: 'HyperText Markup Language - Le squelette de tout site web. Définit la structure et le contenu : titres, paragraphes, images, liens, formulaires.', useCases: ['Pages web', 'Emails HTML', 'Applications web'], difficulty: 'Débutant', marketShare: 'Standard universel', learnTime: '1-2 semaines' },
+                { id: 'CSS', group: 'frontend', shortDesc: 'Style et mise en page', fullDesc: 'Cascading Style Sheets - Contrôle l\'apparence visuelle : couleurs, polices, espacements, animations, responsive design.', useCases: ['Design web', 'Animations', 'Responsive design'], difficulty: 'Débutant-Intermédiaire', marketShare: 'Standard universel', learnTime: '2-4 semaines' },
+                { id: 'JavaScript', group: 'frontend', shortDesc: 'Langage dynamique du web', fullDesc: 'LE langage de programmation du web. Permet l\'interactivité : clics, formulaires dynamiques, animations, appels serveur sans recharger.', useCases: ['Interactivité', 'Apps SPA', 'Backend Node.js'], difficulty: 'Intermédiaire', marketShare: '98% des sites', learnTime: '2-3 mois' },
+                { id: 'TypeScript', group: 'frontend', shortDesc: 'JavaScript typé', fullDesc: 'Surcouche de JavaScript avec typage statique. Détecte les erreurs avant exécution, meilleure autocomplétion.', useCases: ['Gros projets', 'Entreprise', 'Équipes'], difficulty: 'Intermédiaire', marketShare: 'Forte croissance', learnTime: '2-4 semaines' },
+                { id: 'React', group: 'frontend', shortDesc: 'Framework UI Facebook', fullDesc: 'Bibliothèque pour interfaces utilisateur. Composants réutilisables, DOM virtuel, écosystème très riche.', useCases: ['Apps modernes', 'Dashboards', 'E-commerce'], difficulty: 'Intermédiaire', marketShare: '#1 framework', learnTime: '1-2 mois' },
+                { id: 'Vue.js', group: 'frontend', shortDesc: 'Framework progressif', fullDesc: 'Framework JavaScript progressif et accessible. Plus simple que React, très bien documenté.', useCases: ['Apps web', 'Prototypes', 'Migration'], difficulty: 'Intermédiaire', marketShare: '#2-3 framework', learnTime: '3-6 semaines' },
+                { id: 'Angular', group: 'frontend', shortDesc: 'Framework Google complet', fullDesc: 'Framework complet de Google. Tout inclus : routing, forms, HTTP. Très utilisé en entreprise.', useCases: ['Apps entreprise', 'Grands projets'], difficulty: 'Avancé', marketShare: 'Fort en entreprise', learnTime: '2-4 mois' },
+                { id: 'Tailwind CSS', group: 'frontend', shortDesc: 'CSS utilitaire moderne', fullDesc: 'Framework CSS utility-first. Classes prédéfinies pour tout styler sans CSS custom.', useCases: ['Prototypage', 'Design systems'], difficulty: 'Débutant', marketShare: 'Forte croissance', learnTime: '1-2 semaines' },
+                { id: 'Bootstrap', group: 'frontend', shortDesc: 'Framework CSS classique', fullDesc: 'Framework CSS populaire. Composants prêts à l\'emploi : boutons, modals, grilles.', useCases: ['Sites vitrine', 'Admin panels'], difficulty: 'Débutant', marketShare: 'Très répandu', learnTime: '1 semaine' },
+                { id: 'SASS/SCSS', group: 'frontend', shortDesc: 'CSS avec superpowers', fullDesc: 'Préprocesseur CSS avec variables, fonctions, imbrication. Code plus maintenable.', useCases: ['Gros projets CSS', 'Thèmes'], difficulty: 'Intermédiaire', marketShare: 'Standard industrie', learnTime: '1-2 semaines' },
+
+                // ==================== BACKEND ====================
+                { id: 'Node.js', group: 'backend', shortDesc: 'JavaScript côté serveur', fullDesc: 'Environnement JavaScript sur serveur. Même langage front/back, très performant pour APIs.', useCases: ['APIs REST', 'Temps réel', 'Microservices'], difficulty: 'Intermédiaire', marketShare: 'Très populaire', learnTime: '1-2 mois' },
+                { id: 'Express.js', group: 'backend', shortDesc: 'Framework web Node.js', fullDesc: 'Framework minimaliste pour Node.js. Standard pour créer des APIs REST.', useCases: ['APIs REST', 'Backend web'], difficulty: 'Intermédiaire', marketShare: '#1 framework Node', learnTime: '2-4 semaines' },
+                { id: 'Python', group: 'backend', shortDesc: 'Langage polyvalent', fullDesc: 'Langage réputé pour sa lisibilité. Web, data science, IA, automatisation.', useCases: ['Web', 'Data Science', 'IA', 'Scripting'], difficulty: 'Débutant-Intermédiaire', marketShare: '#1 langage général', learnTime: '1-2 mois' },
+                { id: 'Django', group: 'backend', shortDesc: 'Framework Python complet', fullDesc: 'Framework web batteries included. Admin auto, ORM puissant, sécurité intégrée.', useCases: ['Apps complètes', 'APIs', 'CMS'], difficulty: 'Intermédiaire', marketShare: '#1 framework Python', learnTime: '1-2 mois' },
+                { id: 'Flask', group: 'backend', shortDesc: 'Micro-framework Python', fullDesc: 'Framework minimaliste Python. Flexible, pas de structure imposée.', useCases: ['Petites APIs', 'Microservices', 'ML deploy'], difficulty: 'Intermédiaire', marketShare: '#2 framework Python', learnTime: '2-3 semaines' },
+                { id: 'FastAPI', group: 'backend', shortDesc: 'API Python moderne', fullDesc: 'Framework Python ultra-rapide. Typage natif, doc auto Swagger.', useCases: ['APIs REST', 'Microservices', 'ML APIs'], difficulty: 'Intermédiaire', marketShare: 'Forte croissance', learnTime: '2-4 semaines' },
+                { id: 'PHP', group: 'backend', shortDesc: 'Langage web historique', fullDesc: 'Langage serveur historique. Propulse 77% des sites (WordPress).', useCases: ['WordPress', 'CMS', 'E-commerce'], difficulty: 'Débutant-Intermédiaire', marketShare: '77% sites web', learnTime: '1-2 mois' },
+                { id: 'Laravel', group: 'backend', shortDesc: 'Framework PHP élégant', fullDesc: 'Framework PHP moderne. Syntaxe expressive, ORM Eloquent.', useCases: ['Apps web', 'APIs', 'SaaS'], difficulty: 'Intermédiaire', marketShare: '#1 framework PHP', learnTime: '1-2 mois' },
+                { id: 'Java', group: 'backend', shortDesc: 'Langage entreprise', fullDesc: 'Langage mature et robuste. Standard grandes entreprises, banques.', useCases: ['Apps entreprise', 'Android', 'Big Data'], difficulty: 'Intermédiaire-Avancé', marketShare: 'Dominant entreprise', learnTime: '3-6 mois' },
+                { id: 'Spring Boot', group: 'backend', shortDesc: 'Framework Java moderne', fullDesc: 'Framework Java facilitant le développement. Auto-configuration, microservices.', useCases: ['Microservices', 'APIs entreprise'], difficulty: 'Avancé', marketShare: '#1 framework Java', learnTime: '2-3 mois' },
+                { id: 'C#/.NET', group: 'backend', shortDesc: 'Écosystème Microsoft', fullDesc: 'Langage Microsoft puissant. .NET Core cross-platform, jeux Unity.', useCases: ['Entreprise', 'Jeux Unity', 'Windows'], difficulty: 'Intermédiaire', marketShare: 'Fort entreprise', learnTime: '2-4 mois' },
+
+                // ==================== DATABASE ====================
+                { id: 'SQL', group: 'database', shortDesc: 'Langage requêtes BDD', fullDesc: 'Langage universel pour bases relationnelles. SELECT, INSERT, UPDATE, JOIN.', useCases: ['Toutes BDD relationnelles', 'Analyse'], difficulty: 'Débutant-Intermédiaire', marketShare: 'Standard universel', learnTime: '2-4 semaines' },
+                { id: 'PostgreSQL', group: 'database', shortDesc: 'BDD relationnelle avancée', fullDesc: 'Base open-source la plus avancée. JSON, full-text search, géospatial.', useCases: ['Apps complexes', 'GIS', 'Data warehouse'], difficulty: 'Intermédiaire', marketShare: 'Forte croissance', learnTime: '2-4 semaines' },
+                { id: 'MySQL', group: 'database', shortDesc: 'BDD relationnelle populaire', fullDesc: 'Base relationnelle la plus déployée. Simple, fiable, stack LAMP.', useCases: ['Sites web', 'CMS', 'E-commerce'], difficulty: 'Débutant-Intermédiaire', marketShare: '#1 open source', learnTime: '2-3 semaines' },
+                { id: 'MongoDB', group: 'database', shortDesc: 'BDD NoSQL documents', fullDesc: 'Base NoSQL orientée documents JSON. Schéma flexible, scalabilité.', useCases: ['Données flexibles', 'Catalogues', 'Logs'], difficulty: 'Intermédiaire', marketShare: '#1 NoSQL', learnTime: '2-4 semaines' },
+                { id: 'Redis', group: 'database', shortDesc: 'Cache en mémoire', fullDesc: 'Base clé-valeur ultra-rapide en mémoire. Cache, sessions, queues.', useCases: ['Cache', 'Sessions', 'Temps réel'], difficulty: 'Intermédiaire', marketShare: 'Standard cache', learnTime: '1-2 semaines' },
+                { id: 'SQLite', group: 'database', shortDesc: 'BDD embarquée légère', fullDesc: 'Base fichier sans serveur. Apps mobiles, desktop, dev local.', useCases: ['Mobile', 'Desktop', 'Dev local'], difficulty: 'Débutant', marketShare: 'Plus déployée', learnTime: '1 semaine' },
+                { id: 'Elasticsearch', group: 'database', shortDesc: 'Moteur de recherche', fullDesc: 'Moteur recherche distribué. Full-text ultra-rapide, stack ELK.', useCases: ['Recherche', 'Logs ELK', 'Analytics'], difficulty: 'Avancé', marketShare: '#1 recherche', learnTime: '1-2 mois' },
+
+                // ==================== DEVOPS ====================
+                { id: 'Git', group: 'devops', shortDesc: 'Versioning du code', fullDesc: 'Système contrôle version distribué. Historique, branches, collaboration.', useCases: ['Versioning', 'Collaboration', 'CI/CD'], difficulty: 'Débutant-Intermédiaire', marketShare: 'Standard universel', learnTime: '1-2 semaines' },
+                { id: 'GitHub', group: 'tools', shortDesc: 'Plateforme Git #1', fullDesc: 'Hébergement Git #1. Pull requests, CI/CD Actions, CV des devs.', useCases: ['Hébergement', 'Open source', 'CI/CD'], difficulty: 'Débutant', marketShare: '#1 plateforme Git', learnTime: '1 semaine' },
+                { id: 'GitLab', group: 'tools', shortDesc: 'DevOps tout-en-un', fullDesc: 'Plateforme DevOps complète. Git + CI/CD + registres. Auto-hébergeable.', useCases: ['DevOps complet', 'Entreprise'], difficulty: 'Intermédiaire', marketShare: '#2 plateforme', learnTime: '2-3 semaines' },
+                { id: 'Docker', group: 'devops', shortDesc: 'Conteneurisation', fullDesc: 'Plateforme conteneurisation. Package app + dépendances portable.', useCases: ['Déploiement', 'Dev local', 'Microservices'], difficulty: 'Intermédiaire', marketShare: 'Standard conteneurs', learnTime: '2-4 semaines' },
+                { id: 'Kubernetes', group: 'devops', shortDesc: 'Orchestration conteneurs', fullDesc: 'Orchestration conteneurs Google. Déploiement, scaling automatique.', useCases: ['Production', 'Microservices', 'Auto-scaling'], difficulty: 'Avancé', marketShare: 'Standard orchestration', learnTime: '2-4 mois' },
+                { id: 'Linux', group: 'devops', shortDesc: 'OS des serveurs', fullDesc: 'Système open source. 96% serveurs web, base Docker/Cloud.', useCases: ['Serveurs', 'Cloud', 'DevOps'], difficulty: 'Intermédiaire', marketShare: '96% serveurs', learnTime: '1-2 mois' },
+                { id: 'AWS', group: 'devops', shortDesc: 'Cloud Amazon', fullDesc: 'Amazon Web Services - Leader cloud. 200+ services compute, storage, ML.', useCases: ['Hébergement', 'Stockage', 'Serverless', 'ML'], difficulty: 'Intermédiaire-Avancé', marketShare: '#1 cloud (32%)', learnTime: '2-6 mois' },
+                { id: 'Azure', group: 'devops', shortDesc: 'Cloud Microsoft', fullDesc: 'Cloud Microsoft. Intégration Office 365, AD. Populaire entreprise.', useCases: ['Entreprise MS', 'Hybrid cloud', '.NET'], difficulty: 'Intermédiaire-Avancé', marketShare: '#2 cloud (23%)', learnTime: '2-6 mois' },
+                { id: 'GCP', group: 'devops', shortDesc: 'Cloud Google', fullDesc: 'Google Cloud. Excellent data, ML TensorFlow, Kubernetes GKE.', useCases: ['Big Data', 'ML/AI', 'Kubernetes'], difficulty: 'Intermédiaire-Avancé', marketShare: '#3 cloud (10%)', learnTime: '2-6 mois' },
+                { id: 'CI/CD', group: 'devops', shortDesc: 'Intégration continue', fullDesc: 'Automatisation : tests, build, déploiement auto. Jenkins, GitHub Actions.', useCases: ['Automatisation', 'Tests auto', 'Déploiement'], difficulty: 'Intermédiaire', marketShare: 'Pratique standard', learnTime: '2-4 semaines' },
+                { id: 'Terraform', group: 'devops', shortDesc: 'Infrastructure as Code', fullDesc: 'Infrastructure en code, versionnable, reproductible. Multi-cloud.', useCases: ['Provisioning', 'IaC', 'Multi-cloud'], difficulty: 'Avancé', marketShare: '#1 IaC', learnTime: '1-2 mois' },
+                { id: 'Nginx', group: 'devops', shortDesc: 'Serveur web / Proxy', fullDesc: 'Serveur web haute performance et reverse proxy. Load balancing, SSL.', useCases: ['Serveur web', 'Reverse proxy', 'SSL'], difficulty: 'Intermédiaire', marketShare: '#1 serveur web', learnTime: '1-2 semaines' },
+
+                // ==================== CYBERSÉCURITÉ ====================
+                { id: 'OWASP Top 10', group: 'security', shortDesc: 'Top 10 vulnérabilités web', fullDesc: 'Liste des 10 risques de sécurité les plus critiques pour les applications web. Injection SQL, XSS, CSRF, authentification cassée, etc. Référence mondiale.', useCases: ['Audit sécurité', 'Développement sécurisé', 'Formation'], difficulty: 'Intermédiaire', marketShare: 'Standard mondial', learnTime: '2-4 semaines' },
+                { id: 'Pentesting', group: 'security', shortDesc: 'Tests d\'intrusion', fullDesc: 'Tests de pénétration pour identifier les vulnérabilités. Outils : Metasploit, Burp Suite, Nmap, Kali Linux. Ethical hacking.', useCases: ['Audit sécurité', 'Red Team', 'Certification CEH'], difficulty: 'Avancé', marketShare: 'Essentiel sécurité', learnTime: '6-12 mois' },
+                { id: 'Cryptographie', group: 'security', shortDesc: 'Chiffrement des données', fullDesc: 'Science du chiffrement. Algorithmes symétriques (AES), asymétriques (RSA), hachage (SHA), signatures numériques. Base de la sécurité.', useCases: ['Chiffrement', 'Signatures', 'Blockchain', 'SSL/TLS'], difficulty: 'Avancé', marketShare: 'Fondamental', learnTime: '2-4 mois' },
+                { id: 'SSL/TLS', group: 'security', shortDesc: 'Chiffrement des connexions', fullDesc: 'Protocoles sécurisant les communications web (HTTPS). Certificats, handshake, chiffrement en transit. Let\'s Encrypt.', useCases: ['HTTPS', 'APIs sécurisées', 'VPN'], difficulty: 'Intermédiaire', marketShare: 'Standard web', learnTime: '1-2 semaines' },
+                { id: 'OAuth 2.0 / JWT', group: 'security', shortDesc: 'Authentification moderne', fullDesc: 'OAuth 2.0 : protocole d\'autorisation (login Google/Facebook). JWT : tokens signés pour authentification stateless.', useCases: ['SSO', 'APIs', 'Login social', 'Mobile'], difficulty: 'Intermédiaire', marketShare: 'Standard moderne', learnTime: '2-4 semaines' },
+                { id: 'Firewall / WAF', group: 'security', shortDesc: 'Protection périmétrique', fullDesc: 'Firewall : filtrage réseau (iptables, pfsense). WAF : protection applicative web contre injections, XSS. Cloudflare, AWS WAF.', useCases: ['Protection réseau', 'Anti-DDoS', 'Filtrage'], difficulty: 'Intermédiaire', marketShare: 'Essentiel', learnTime: '2-4 semaines' },
+                { id: 'SIEM / SOC', group: 'security', shortDesc: 'Surveillance et détection', fullDesc: 'SIEM : centralisation et corrélation des logs de sécurité (Splunk, ELK). SOC : centre opérationnel de surveillance 24/7.', useCases: ['Détection intrusions', 'Compliance', 'Forensics'], difficulty: 'Avancé', marketShare: 'Entreprise', learnTime: '3-6 mois' },
+                { id: 'IAM', group: 'security', shortDesc: 'Gestion des identités', fullDesc: 'Identity & Access Management. Gestion utilisateurs, rôles, permissions. LDAP, Active Directory, Keycloak, Okta.', useCases: ['SSO entreprise', 'RBAC', 'Compliance'], difficulty: 'Intermédiaire', marketShare: 'Standard entreprise', learnTime: '1-2 mois' },
+                { id: 'Zero Trust', group: 'security', shortDesc: 'Sécurité sans confiance', fullDesc: 'Architecture de sécurité "ne jamais faire confiance, toujours vérifier". Micro-segmentation, authentification continue, moindre privilège.', useCases: ['Cloud security', 'Télétravail', 'Microsegmentation'], difficulty: 'Avancé', marketShare: 'Tendance forte', learnTime: '2-4 mois' },
+                { id: 'DevSecOps', group: 'security', shortDesc: 'Sécurité dans le CI/CD', fullDesc: 'Intégration de la sécurité dans le cycle DevOps. SAST, DAST, SCA, secrets scanning. Shift-left security.', useCases: ['CI/CD sécurisé', 'Scan vulnérabilités', 'Compliance'], difficulty: 'Avancé', marketShare: 'Pratique moderne', learnTime: '2-3 mois' },
+                { id: 'Sécurité Réseau', group: 'security', shortDesc: 'Protection infrastructure', fullDesc: 'VPN, IDS/IPS, segmentation réseau, DMZ. Protection contre sniffing, MITM, DDoS. Wireshark, Snort.', useCases: ['Infrastructure', 'VPN', 'Détection intrusion'], difficulty: 'Intermédiaire-Avancé', marketShare: 'Fondamental', learnTime: '2-4 mois' },
+                { id: 'RGPD / Compliance', group: 'security', shortDesc: 'Conformité réglementaire', fullDesc: 'RGPD (Europe), SOC2, ISO 27001, PCI-DSS. Protection données personnelles, audits, DPO. Amendes jusqu\'à 4% CA.', useCases: ['Protection données', 'Audits', 'Certifications'], difficulty: 'Intermédiaire', marketShare: 'Obligatoire EU', learnTime: '1-2 mois' },
+
+                // ==================== OUTILS ====================
+                { id: 'VS Code', group: 'tools', shortDesc: 'Éditeur #1', fullDesc: 'Éditeur gratuit Microsoft. Extensions, IntelliSense, débogage, Git.', useCases: ['Tous langages', 'Web', 'Python'], difficulty: 'Débutant', marketShare: '#1 éditeur (74%)', learnTime: '1 semaine' },
+                { id: 'IntelliJ IDEA', group: 'tools', shortDesc: 'IDE JetBrains', fullDesc: 'IDE premium JetBrains. Refactoring avancé, analyse code, polyglotte.', useCases: ['Java', 'Kotlin', 'Entreprise'], difficulty: 'Intermédiaire', marketShare: '#1 IDE Java', learnTime: '2-3 semaines' },
+                { id: 'Postman', group: 'tools', shortDesc: 'Test APIs', fullDesc: 'Tester, documenter, partager APIs. Collections, environnements, mocks.', useCases: ['Test APIs', 'Documentation', 'Mocks'], difficulty: 'Débutant', marketShare: '#1 outil API', learnTime: '1 semaine' },
+                { id: 'npm/yarn', group: 'tools', shortDesc: 'Packages JS', fullDesc: 'Gestionnaires paquets JavaScript/Node.js. Gèrent les dépendances.', useCases: ['Dépendances JS', 'Scripts'], difficulty: 'Débutant', marketShare: 'Standard JS', learnTime: '1 semaine' },
+                { id: 'Webpack/Vite', group: 'tools', shortDesc: 'Bundlers JS', fullDesc: 'Outils build JS. Bundling, minification, HMR. Vite plus rapide.', useCases: ['Build apps JS', 'Optimisation'], difficulty: 'Intermédiaire', marketShare: 'Vite en croissance', learnTime: '1-2 semaines' },
+                { id: 'ESLint/Prettier', group: 'tools', shortDesc: 'Qualité code', fullDesc: 'ESLint : erreurs JS. Prettier : formatage auto. Indispensables équipe.', useCases: ['Qualité', 'Formatage', 'Standards'], difficulty: 'Débutant', marketShare: 'Standards JS', learnTime: '1 jour' },
+
+                // ==================== TESTING ====================
+                { id: 'Jest', group: 'testing', shortDesc: 'Tests JS', fullDesc: 'Framework test JavaScript Facebook. Tests unitaires, snapshots, mocking.', useCases: ['Tests unitaires', 'Tests React', 'Snapshots'], difficulty: 'Intermédiaire', marketShare: '#1 test JS', learnTime: '1-2 semaines' },
+                { id: 'Cypress', group: 'testing', shortDesc: 'Tests E2E modernes', fullDesc: 'Tests end-to-end modernes. Vrai navigateur, debug facile, screenshots.', useCases: ['Tests E2E', 'Tests UI'], difficulty: 'Intermédiaire', marketShare: 'Forte croissance', learnTime: '2-3 semaines' },
+                { id: 'Selenium', group: 'testing', shortDesc: 'Automatisation navigateur', fullDesc: 'Automatisation navigateurs. Standard E2E historique, tous langages.', useCases: ['Tests E2E', 'Automatisation', 'Scraping'], difficulty: 'Intermédiaire', marketShare: 'Standard historique', learnTime: '2-4 semaines' },
+                { id: 'JUnit', group: 'testing', shortDesc: 'Tests Java', fullDesc: 'Framework tests unitaires Java. Standard industrie, intégré IDEs.', useCases: ['Tests Java', 'TDD', 'CI/CD'], difficulty: 'Intermédiaire', marketShare: 'Standard Java', learnTime: '1 semaine' },
+                { id: 'Pytest', group: 'testing', shortDesc: 'Tests Python', fullDesc: 'Framework test Python moderne. Syntaxe simple, fixtures, plugins.', useCases: ['Tests Python', 'Tests Django/Flask'], difficulty: 'Intermédiaire', marketShare: '#1 test Python', learnTime: '1-2 semaines' },
+
+                // ==================== DATA ====================
+                { id: 'Data Science', group: 'data', shortDesc: 'Analyse données', fullDesc: 'Stats + programmation + métier pour insights. Python + SQL + visualisation.', useCases: ['Analyse business', 'Prédictions', 'Dashboards'], difficulty: 'Avancé', marketShare: 'En explosion', learnTime: '6-12 mois' },
+                { id: 'Machine Learning', group: 'data', shortDesc: 'IA apprentissage', fullDesc: 'IA où machines apprennent des données. Scikit-learn, TensorFlow, PyTorch.', useCases: ['Prédictions', 'Recommandations', 'NLP', 'Vision'], difficulty: 'Avancé', marketShare: 'Forte croissance', learnTime: '6-12 mois' },
+                { id: 'Pandas', group: 'data', shortDesc: 'Manipulation données', fullDesc: 'Bibliothèque Python manipulation données. DataFrames, nettoyage, agrégation.', useCases: ['Data cleaning', 'Analyse', 'ETL'], difficulty: 'Intermédiaire', marketShare: 'Standard data Python', learnTime: '2-4 semaines' },
+                { id: 'Power BI/Tableau', group: 'data', shortDesc: 'Visualisation business', fullDesc: 'Outils BI. Dashboards interactifs, connexion multi-sources, rapports auto.', useCases: ['Dashboards', 'Reporting', 'KPIs'], difficulty: 'Intermédiaire', marketShare: 'Standards BI', learnTime: '2-4 semaines' },
+
+                // ==================== ARCHITECTURE ====================
+                { id: 'API REST', group: 'architecture', shortDesc: 'Standard communication', fullDesc: 'Architecture standard APIs web. HTTP GET/POST/PUT/DELETE, JSON, stateless.', useCases: ['Front-back', 'Intégrations', 'Mobile'], difficulty: 'Intermédiaire', marketShare: 'Standard web', learnTime: '1-2 semaines' },
+                { id: 'GraphQL', group: 'architecture', shortDesc: 'Alternative REST', fullDesc: 'Langage requête APIs Facebook. Client demande exactement ce qu\'il veut.', useCases: ['Apps mobiles', 'Dashboards complexes'], difficulty: 'Intermédiaire-Avancé', marketShare: 'En croissance', learnTime: '2-4 semaines' },
+                { id: 'Microservices', group: 'architecture', shortDesc: 'Architecture distribuée', fullDesc: 'App découpée en petits services indépendants. Scalabilité, déploiement indépendant.', useCases: ['Grandes apps', 'Équipes multiples'], difficulty: 'Avancé', marketShare: 'Standard entreprises', learnTime: '3-6 mois' },
+                { id: 'WebSockets', group: 'architecture', shortDesc: 'Temps réel', fullDesc: 'Communication bidirectionnelle temps réel. Chat, notifications, jeux.', useCases: ['Chat', 'Notifications', 'Collaboration'], difficulty: 'Intermédiaire', marketShare: 'Standard temps réel', learnTime: '1-2 semaines' },
+
+                // ==================== MÉTHODOLOGIES ====================
+                { id: 'Agile/Scrum', group: 'methodo', shortDesc: 'Gestion projet itérative', fullDesc: 'Méthodologie par itérations (sprints 2-4 semaines). Daily, backlog, retros.', useCases: ['Dev logiciel', 'Gestion équipe'], difficulty: 'Débutant', marketShare: '71% équipes IT', learnTime: '1-2 semaines' },
+                { id: 'DevOps Culture', group: 'methodo', shortDesc: 'Culture Dev + Ops', fullDesc: 'Philosophie unifiant dev et ops. Automatisation, CI/CD, monitoring.', useCases: ['Déploiement continu', 'Automatisation'], difficulty: 'Avancé', marketShare: 'Standard moderne', learnTime: '3-6 mois' },
+
+                // ==================== DESIGN ====================
+                { id: 'Figma', group: 'design', shortDesc: 'Design UI/UX', fullDesc: 'Design UI/UX dans navigateur. Collaboration temps réel, prototypes, handoff.', useCases: ['Maquettes', 'Prototypes', 'Design systems'], difficulty: 'Débutant-Intermédiaire', marketShare: '#1 outil design', learnTime: '2-4 semaines' },
+                { id: 'UX/UI Design', group: 'design', shortDesc: 'Expérience utilisateur', fullDesc: 'UX : recherche, parcours, usabilité. UI : design visuel, accessibilité.', useCases: ['Conception produit', 'Conversion'], difficulty: 'Intermédiaire', marketShare: 'Discipline essentielle', learnTime: '3-6 mois' },
+            ],
+            
+            links: [
+                // Frontend chain
+                { source: 'HTML', target: 'CSS', strength: 1 },
+                { source: 'CSS', target: 'JavaScript', strength: 1 },
+                { source: 'CSS', target: 'SASS/SCSS', strength: 0.9 },
+                { source: 'CSS', target: 'Tailwind CSS', strength: 0.8 },
+                { source: 'CSS', target: 'Bootstrap', strength: 0.8 },
+                { source: 'JavaScript', target: 'TypeScript', strength: 0.9 },
+                { source: 'JavaScript', target: 'React', strength: 1 },
+                { source: 'JavaScript', target: 'Vue.js', strength: 1 },
+                { source: 'JavaScript', target: 'Angular', strength: 1 },
+                { source: 'TypeScript', target: 'React', strength: 0.9 },
+                { source: 'TypeScript', target: 'Angular', strength: 1 },
+                { source: 'Tailwind CSS', target: 'React', strength: 0.7 },
+                { source: 'Tailwind CSS', target: 'Vue.js', strength: 0.7 },
+                
+                // JS to Node
+                { source: 'JavaScript', target: 'Node.js', strength: 1 },
+                { source: 'Node.js', target: 'Express.js', strength: 1 },
+                { source: 'TypeScript', target: 'Node.js', strength: 0.8 },
+                
+                // Python ecosystem
+                { source: 'Python', target: 'Django', strength: 1 },
+                { source: 'Python', target: 'Flask', strength: 1 },
+                { source: 'Python', target: 'FastAPI', strength: 1 },
+                { source: 'Python', target: 'Pandas', strength: 0.9 },
+                { source: 'Python', target: 'Data Science', strength: 0.95 },
+                { source: 'Python', target: 'Machine Learning', strength: 0.9 },
+                { source: 'Python', target: 'Pytest', strength: 0.8 },
+                
+                // PHP ecosystem
+                { source: 'PHP', target: 'Laravel', strength: 1 },
+                { source: 'PHP', target: 'MySQL', strength: 0.9 },
+                
+                // Java ecosystem
+                { source: 'Java', target: 'Spring Boot', strength: 1 },
+                { source: 'Java', target: 'JUnit', strength: 0.9 },
+                
+                // C# ecosystem
+                { source: 'C#/.NET', target: 'Azure', strength: 0.7 },
+                
+                // Frontend to Backend (API)
+                { source: 'React', target: 'API REST', strength: 0.9 },
+                { source: 'Vue.js', target: 'API REST', strength: 0.9 },
+                { source: 'Angular', target: 'API REST', strength: 0.9 },
+                { source: 'React', target: 'GraphQL', strength: 0.7 },
+                { source: 'React', target: 'Node.js', strength: 0.8 },
+                
+                // API to Backend
+                { source: 'API REST', target: 'Express.js', strength: 0.95 },
+                { source: 'API REST', target: 'Django', strength: 0.95 },
+                { source: 'API REST', target: 'FastAPI', strength: 0.95 },
+                { source: 'API REST', target: 'Spring Boot', strength: 0.95 },
+                { source: 'API REST', target: 'Laravel', strength: 0.9 },
+                { source: 'GraphQL', target: 'Node.js', strength: 0.8 },
+                
+                // Backend to Database
+                { source: 'Django', target: 'PostgreSQL', strength: 0.95 },
+                { source: 'Express.js', target: 'MongoDB', strength: 0.85 },
+                { source: 'Express.js', target: 'PostgreSQL', strength: 0.8 },
+                { source: 'FastAPI', target: 'PostgreSQL', strength: 0.9 },
+                { source: 'Spring Boot', target: 'PostgreSQL', strength: 0.9 },
+                { source: 'Laravel', target: 'MySQL', strength: 0.95 },
+                { source: 'Node.js', target: 'MongoDB', strength: 0.85 },
+                
+                // Database connections
+                { source: 'SQL', target: 'PostgreSQL', strength: 1 },
+                { source: 'SQL', target: 'MySQL', strength: 1 },
+                { source: 'SQL', target: 'SQLite', strength: 1 },
+                { source: 'PostgreSQL', target: 'Redis', strength: 0.6 },
+                { source: 'MongoDB', target: 'Redis', strength: 0.6 },
+                { source: 'SQL', target: 'Data Science', strength: 0.8 },
+                { source: 'Elasticsearch', target: 'Microservices', strength: 0.7 },
+                
+                // Data Science chain
+                { source: 'Data Science', target: 'Machine Learning', strength: 0.95 },
+                { source: 'Data Science', target: 'Pandas', strength: 0.95 },
+                { source: 'Data Science', target: 'Power BI/Tableau', strength: 0.8 },
+                { source: 'Pandas', target: 'Machine Learning', strength: 0.8 },
+                
+                // DevOps chain
+                { source: 'Git', target: 'GitHub', strength: 1 },
+                { source: 'Git', target: 'GitLab', strength: 1 },
+                { source: 'Git', target: 'CI/CD', strength: 0.95 },
+                { source: 'GitHub', target: 'CI/CD', strength: 0.9 },
+                { source: 'GitLab', target: 'CI/CD', strength: 0.95 },
+                { source: 'CI/CD', target: 'Docker', strength: 0.95 },
+                { source: 'Docker', target: 'Kubernetes', strength: 0.95 },
+                { source: 'Docker', target: 'Linux', strength: 0.9 },
+                { source: 'Linux', target: 'Nginx', strength: 0.85 },
+                { source: 'Kubernetes', target: 'AWS', strength: 0.85 },
+                { source: 'Kubernetes', target: 'GCP', strength: 0.9 },
+                { source: 'Kubernetes', target: 'Azure', strength: 0.85 },
+                { source: 'Terraform', target: 'AWS', strength: 0.9 },
+                { source: 'Terraform', target: 'Azure', strength: 0.9 },
+                { source: 'Terraform', target: 'GCP', strength: 0.9 },
+                { source: 'Docker', target: 'AWS', strength: 0.8 },
+                { source: 'Linux', target: 'AWS', strength: 0.85 },
+                
+                // ==================== SECURITY CONNECTIONS ====================
+                // OWASP connections
+                { source: 'OWASP Top 10', target: 'Pentesting', strength: 0.95 },
+                { source: 'OWASP Top 10', target: 'DevSecOps', strength: 0.9 },
+                { source: 'OWASP Top 10', target: 'Django', strength: 0.7 },
+                { source: 'OWASP Top 10', target: 'Express.js', strength: 0.7 },
+                { source: 'OWASP Top 10', target: 'Laravel', strength: 0.7 },
+                
+                // Pentesting connections
+                { source: 'Pentesting', target: 'Linux', strength: 0.9 },
+                { source: 'Pentesting', target: 'Sécurité Réseau', strength: 0.95 },
+                { source: 'Pentesting', target: 'Python', strength: 0.7 },
+                
+                // Crypto connections
+                { source: 'Cryptographie', target: 'SSL/TLS', strength: 1 },
+                { source: 'Cryptographie', target: 'OAuth 2.0 / JWT', strength: 0.85 },
+                { source: 'Cryptographie', target: 'Python', strength: 0.6 },
+                
+                // SSL/TLS connections
+                { source: 'SSL/TLS', target: 'Nginx', strength: 0.95 },
+                { source: 'SSL/TLS', target: 'API REST', strength: 0.9 },
+                { source: 'SSL/TLS', target: 'AWS', strength: 0.7 },
+                
+                // OAuth/JWT connections
+                { source: 'OAuth 2.0 / JWT', target: 'API REST', strength: 0.95 },
+                { source: 'OAuth 2.0 / JWT', target: 'React', strength: 0.8 },
+                { source: 'OAuth 2.0 / JWT', target: 'Node.js', strength: 0.85 },
+                { source: 'OAuth 2.0 / JWT', target: 'IAM', strength: 0.9 },
+                
+                // Firewall/WAF connections
+                { source: 'Firewall / WAF', target: 'Nginx', strength: 0.85 },
+                { source: 'Firewall / WAF', target: 'AWS', strength: 0.8 },
+                { source: 'Firewall / WAF', target: 'Sécurité Réseau', strength: 0.95 },
+                { source: 'Firewall / WAF', target: 'Linux', strength: 0.8 },
+                
+                // SIEM/SOC connections
+                { source: 'SIEM / SOC', target: 'Elasticsearch', strength: 0.9 },
+                { source: 'SIEM / SOC', target: 'Sécurité Réseau', strength: 0.9 },
+                { source: 'SIEM / SOC', target: 'RGPD / Compliance', strength: 0.85 },
+                
+                // IAM connections
+                { source: 'IAM', target: 'AWS', strength: 0.85 },
+                { source: 'IAM', target: 'Azure', strength: 0.85 },
+                { source: 'IAM', target: 'Zero Trust', strength: 0.9 },
+                { source: 'IAM', target: 'RGPD / Compliance', strength: 0.8 },
+                
+                // Zero Trust connections
+                { source: 'Zero Trust', target: 'Microservices', strength: 0.85 },
+                { source: 'Zero Trust', target: 'Kubernetes', strength: 0.8 },
+                { source: 'Zero Trust', target: 'Sécurité Réseau', strength: 0.9 },
+                
+                // DevSecOps connections
+                { source: 'DevSecOps', target: 'CI/CD', strength: 1 },
+                { source: 'DevSecOps', target: 'Docker', strength: 0.9 },
+                { source: 'DevSecOps', target: 'Git', strength: 0.85 },
+                { source: 'DevSecOps', target: 'DevOps Culture', strength: 0.95 },
+                
+                // Network Security connections
+                { source: 'Sécurité Réseau', target: 'Linux', strength: 0.9 },
+                { source: 'Sécurité Réseau', target: 'AWS', strength: 0.75 },
+                
+                // RGPD connections
+                { source: 'RGPD / Compliance', target: 'PostgreSQL', strength: 0.7 },
+                { source: 'RGPD / Compliance', target: 'MongoDB', strength: 0.7 },
+                
+                // Tools connections
+                { source: 'VS Code', target: 'Git', strength: 0.8 },
+                { source: 'VS Code', target: 'JavaScript', strength: 0.8 },
+                { source: 'VS Code', target: 'Python', strength: 0.8 },
+                { source: 'VS Code', target: 'TypeScript', strength: 0.8 },
+                { source: 'IntelliJ IDEA', target: 'Java', strength: 0.95 },
+                { source: 'Postman', target: 'API REST', strength: 0.95 },
+                { source: 'npm/yarn', target: 'Node.js', strength: 1 },
+                { source: 'npm/yarn', target: 'React', strength: 0.9 },
+                { source: 'Webpack/Vite', target: 'React', strength: 0.9 },
+                { source: 'Webpack/Vite', target: 'JavaScript', strength: 0.9 },
+                { source: 'ESLint/Prettier', target: 'JavaScript', strength: 0.9 },
+                { source: 'ESLint/Prettier', target: 'TypeScript', strength: 0.9 },
+                
+                // Testing connections
+                { source: 'Jest', target: 'React', strength: 0.95 },
+                { source: 'Jest', target: 'JavaScript', strength: 0.9 },
+                { source: 'Cypress', target: 'React', strength: 0.85 },
+                { source: 'Cypress', target: 'Vue.js', strength: 0.85 },
+                { source: 'Selenium', target: 'Java', strength: 0.8 },
+                { source: 'Selenium', target: 'Python', strength: 0.8 },
+                { source: 'JUnit', target: 'Spring Boot', strength: 0.9 },
+                { source: 'Pytest', target: 'Django', strength: 0.9 },
+                { source: 'Pytest', target: 'FastAPI', strength: 0.9 },
+                
+                // Architecture
+                { source: 'Microservices', target: 'Docker', strength: 0.95 },
+                { source: 'Microservices', target: 'Kubernetes', strength: 0.95 },
+                { source: 'Microservices', target: 'API REST', strength: 0.9 },
+                { source: 'WebSockets', target: 'Node.js', strength: 0.85 },
+                { source: 'WebSockets', target: 'Redis', strength: 0.7 },
+                
+                // Méthodologies
+                { source: 'Agile/Scrum', target: 'Git', strength: 0.7 },
+                { source: 'DevOps Culture', target: 'CI/CD', strength: 1 },
+                { source: 'DevOps Culture', target: 'Docker', strength: 0.95 },
+                { source: 'DevOps Culture', target: 'Kubernetes', strength: 0.9 },
+                { source: 'DevOps Culture', target: 'Terraform', strength: 0.9 },
+                
+                // Design
+                { source: 'Figma', target: 'UX/UI Design', strength: 0.95 },
+                { source: 'UX/UI Design', target: 'React', strength: 0.7 },
+                { source: 'UX/UI Design', target: 'CSS', strength: 0.75 },
+                { source: 'Figma', target: 'React', strength: 0.6 },
+            ]
+        };
+
+        const groupColors = {
+            frontend: '#3B82F6',
+            backend: '#10B981',
+            database: '#F59E0B',
+            devops: '#8B5CF6',
+            data: '#EC4899',
+            architecture: '#06B6D4',
+            methodo: '#6B7280',
+            tools: '#EF4444',
+            testing: '#14B8A6',
+            design: '#F472B6',
+            security: '#DC2626'
+        };
+
+        const groupLabels = {
+            frontend: 'Frontend',
+            backend: 'Backend',
+            database: 'Base de données',
+            devops: 'DevOps & Cloud',
+            security: 'Cybersécurité',
+            data: 'Data & IA',
+            architecture: 'Architecture',
+            methodo: 'Méthodologie',
+            tools: 'Outils Dev',
+            testing: 'Testing',
+            design: 'Design'
+        };
+
+        const groupIcons = {
+            frontend: '🎨',
+            backend: '⚙️',
+            database: '🗄️',
+            devops: '☁️',
+            security: '🔒',
+            data: '📊',
+            architecture: '🏗️',
+            methodo: '📋',
+            tools: '🛠️',
+            testing: '🧪',
+            design: '✨'
+        };
+
+        let currentFilter = null;
+        let selectedNode = null;
+        let simulation = null;
+
+        function init() {
+            renderFilters();
+            renderGraph();
+            renderSidebar();
+            
+            document.getElementById('searchInput').addEventListener('input', (e) => {
+                renderGraph(e.target.value);
+            });
+        }
+
+        function renderFilters() {
+            const container = document.getElementById('filterButtons');
+            
+            let html = `<button class="filter-btn active" onclick="setFilter(null)">Tout (${techData.nodes.length})</button>`;
+            
+            Object.entries(groupLabels).forEach(([key, label]) => {
+                const count = techData.nodes.filter(n => n.group === key).length;
+                html += `<button class="filter-btn" data-group="${key}" onclick="setFilter('${key}')">${groupIcons[key]} ${label} (${count})</button>`;
+            });
+            
+            container.innerHTML = html;
+        }
+
+        function setFilter(group) {
+            currentFilter = group;
+            
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+                btn.style.background = '#f1f5f9';
+                btn.style.color = '#475569';
+                if (btn.dataset.group === group || (!group && !btn.dataset.group)) {
+                    btn.classList.add('active');
+                    if (group) {
+                        btn.style.background = groupColors[group];
+                        btn.style.color = 'white';
+                    } else {
+                        btn.style.background = '#1e293b';
+                        btn.style.color = 'white';
+                    }
+                }
+            });
+            
+            renderGraph(document.getElementById('searchInput').value);
+        }
+
+        function renderGraph(searchTerm = '') {
+            const svg = d3.select('#graph');
+            svg.selectAll('*').remove();
+            
+            const width = svg.node().getBoundingClientRect().width || 900;
+            const height = svg.node().getBoundingClientRect().height || 600;
+
+            // Filter nodes
+            const filteredNodes = techData.nodes.filter(node => {
+                const matchesGroup = !currentFilter || node.group === currentFilter;
+                const matchesSearch = !searchTerm || 
+                    node.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                    node.shortDesc.toLowerCase().includes(searchTerm.toLowerCase());
+                return matchesGroup && matchesSearch;
+            });
+
+            const filteredNodeIds = new Set(filteredNodes.map(n => n.id));
+            const filteredLinks = techData.links.filter(link => 
+                filteredNodeIds.has(link.source.id || link.source) && 
+                filteredNodeIds.has(link.target.id || link.target)
+            );
+
+            // Update stats
+            document.getElementById('nodeCount').textContent = filteredNodes.length;
+            document.getElementById('linkCount').textContent = filteredLinks.length;
+
+            const container = svg.append('g');
+
+            // Zoom
+            const zoom = d3.zoom()
+                .scaleExtent([0.2, 4])
+                .on('zoom', (event) => container.attr('transform', event.transform));
+            svg.call(zoom);
+
+            // Deep copy for simulation
+            const nodes = filteredNodes.map(d => ({...d}));
+            const links = filteredLinks.map(d => ({
+                source: typeof d.source === 'object' ? d.source.id : d.source,
+                target: typeof d.target === 'object' ? d.target.id : d.target,
+                strength: d.strength
+            }));
+
+            simulation = d3.forceSimulation(nodes)
+                .force('link', d3.forceLink(links).id(d => d.id).distance(120).strength(d => d.strength * 0.4))
+                .force('charge', d3.forceManyBody().strength(-350))
+                .force('center', d3.forceCenter(width / 2, height / 2))
+                .force('collision', d3.forceCollide().radius(45));
+
+            // Links
+            const link = container.append('g')
+                .selectAll('line')
+                .data(links)
+                .join('line')
+                .attr('stroke', '#CBD5E1')
+                .attr('stroke-opacity', 0.5)
+                .attr('stroke-width', d => d.strength * 2.5);
+
+            // Nodes
+            const node = container.append('g')
+                .selectAll('g')
+                .data(nodes)
+                .join('g')
+                .attr('cursor', 'pointer')
+                .call(d3.drag()
+                    .on('start', dragstarted)
+                    .on('drag', dragged)
+                    .on('end', dragended));
+
+            node.append('circle')
+                .attr('r', 28)
+                .attr('fill', d => groupColors[d.group])
+                .attr('stroke', '#fff')
+                .attr('stroke-width', 3)
+                .attr('opacity', 0.9)
+                .style('filter', 'drop-shadow(0 2px 4px rgba(0,0,0,0.1))');
+
+            node.append('text')
+                .text(d => d.id.length > 12 ? d.id.substring(0, 10) + '...' : d.id)
+                .attr('text-anchor', 'middle')
+                .attr('dy', 42)
+                .attr('font-size', '11px')
+                .attr('font-weight', '600')
+                .attr('fill', '#374151')
+                .style('pointer-events', 'none');
+
+            // Interactions
+            node.on('click', (event, d) => {
+                event.stopPropagation();
+                selectedNode = selectedNode?.id === d.id ? null : d;
+                highlightConnections(d, link, node, links);
+                renderSidebar(d);
+            });
+
+            node.on('mouseover', (event, d) => {
+                d3.select(event.currentTarget).select('circle')
+                    .transition().duration(200)
+                    .attr('r', 34).attr('stroke-width', 4);
+                if (!selectedNode) renderSidebar(d);
+            });
+
+            node.on('mouseout', (event) => {
+                d3.select(event.currentTarget).select('circle')
+                    .transition().duration(200)
+                    .attr('r', 28).attr('stroke-width', 3);
+                if (!selectedNode) renderSidebar(null);
+            });
+
+            svg.on('click', () => {
+                selectedNode = null;
+                resetHighlight(link, node);
+                renderSidebar(null);
+            });
+
+            simulation.on('tick', () => {
+                link
+                    .attr('x1', d => d.source.x)
+                    .attr('y1', d => d.source.y)
+                    .attr('x2', d => d.target.x)
+                    .attr('y2', d => d.target.y);
+                node.attr('transform', d => `translate(${d.x},${d.y})`);
+            });
+
+            function dragstarted(event, d) {
+                if (!event.active) simulation.alphaTarget(0.3).restart();
+                d.fx = d.x; d.fy = d.y;
+            }
+            function dragged(event, d) { d.fx = event.x; d.fy = event.y; }
+            function dragended(event, d) {
+                if (!event.active) simulation.alphaTarget(0);
+                d.fx = null; d.fy = null;
+            }
+        }
+
+        function highlightConnections(d, link, node, links) {
+            const connectedNodes = new Set([d.id]);
+            links.forEach(l => {
+                const sourceId = typeof l.source === 'object' ? l.source.id : l.source;
+                const targetId = typeof l.target === 'object' ? l.target.id : l.target;
+                if (sourceId === d.id) connectedNodes.add(targetId);
+                if (targetId === d.id) connectedNodes.add(sourceId);
+            });
+
+            node.select('circle').transition().duration(300)
+                .attr('opacity', n => connectedNodes.has(n.id) ? 1 : 0.15);
+            node.select('text').transition().duration(300)
+                .attr('opacity', n => connectedNodes.has(n.id) ? 1 : 0.15);
+
+            link.transition().duration(300)
+                .attr('stroke-opacity', l => {
+                    const sourceId = typeof l.source === 'object' ? l.source.id : l.source;
+                    const targetId = typeof l.target === 'object' ? l.target.id : l.target;
+                    return (sourceId === d.id || targetId === d.id) ? 0.9 : 0.05;
+                })
+                .attr('stroke', l => {
+                    const sourceId = typeof l.source === 'object' ? l.source.id : l.source;
+                    const targetId = typeof l.target === 'object' ? l.target.id : l.target;
+                    return (sourceId === d.id || targetId === d.id) ? groupColors[d.group] : '#CBD5E1';
+                })
+                .attr('stroke-width', l => {
+                    const sourceId = typeof l.source === 'object' ? l.source.id : l.source;
+                    const targetId = typeof l.target === 'object' ? l.target.id : l.target;
+                    return (sourceId === d.id || targetId === d.id) ? 4 : l.strength * 2.5;
+                });
+        }
+
+        function resetHighlight(link, node) {
+            node.select('circle').transition().duration(300).attr('opacity', 0.9);
+            node.select('text').transition().duration(300).attr('opacity', 1);
+            link.transition().duration(300)
+                .attr('stroke-opacity', 0.5)
+                .attr('stroke', '#CBD5E1')
+                .attr('stroke-width', d => d.strength * 2.5);
+        }
+
+        function getConnectedTechnologies(nodeId) {
+            return techData.links
+                .filter(l => {
+                    const sourceId = l.source.id || l.source;
+                    const targetId = l.target.id || l.target;
+                    return sourceId === nodeId || targetId === nodeId;
+                })
+                .map(l => {
+                    const sourceId = l.source.id || l.source;
+                    const targetId = l.target.id || l.target;
+                    const connectedId = sourceId === nodeId ? targetId : sourceId;
+                    return techData.nodes.find(n => n.id === connectedId);
+                })
+                .filter(Boolean);
+        }
+
+        function renderSidebar(node) {
+            const sidebar = document.getElementById('sidebar');
+            
+            if (node) {
+                const connected = getConnectedTechnologies(node.id);
+                sidebar.innerHTML = `
+                    <div class="node-header">
+                        <div class="node-icon" style="background: ${groupColors[node.group]}">
+                            ${groupIcons[node.group]}
+                        </div>
+                        <div>
+                            <span class="category-badge" style="background: ${groupColors[node.group]}">${groupLabels[node.group]}</span>
+                            <div class="node-title">${node.id}</div>
+                            <div class="node-subtitle">${node.shortDesc}</div>
+                        </div>
+                    </div>
+                    
+                    <div class="description-box">
+                        <h4>📖 Description</h4>
+                        <p>${node.fullDesc}</p>
+                    </div>
+                    
+                    <div class="meta-grid">
+                        <div class="meta-item blue">
+                            <div class="meta-label">Difficulté</div>
+                            <div class="meta-value">${node.difficulty}</div>
+                        </div>
+                        <div class="meta-item green">
+                            <div class="meta-label">Apprentissage</div>
+                            <div class="meta-value">${node.learnTime}</div>
+                        </div>
+                    </div>
+                    <div class="meta-item purple" style="margin-bottom: 12px;">
+                        <div class="meta-label">Part de marché</div>
+                        <div class="meta-value">${node.marketShare}</div>
+                    </div>
+                    
+                    <div class="tags-section" style="margin-bottom: 16px;">
+                        <h4>🎯 Cas d'usage</h4>
+                        <div class="tags-container">
+                            ${node.useCases.map(u => `<span class="tag">${u}</span>`).join('')}
+                        </div>
+                    </div>
+                    
+                    <div class="tags-section">
+                        <h4>🔗 Connecté à (${connected.length})</h4>
+                        <div class="tags-container">
+                            ${connected.map(t => `<span class="tag clickable" style="background: ${groupColors[t.group]}" onclick="selectNodeById('${t.id}')">${t.id}</span>`).join('')}
+                        </div>
+                    </div>
+                `;
+            } else {
+                sidebar.innerHTML = `
+                    <div class="welcome-box">
+                        <div class="icon">👆</div>
+                        <h3>Explorez l'écosystème</h3>
+                        <p>Cliquez sur une technologie pour voir ses détails et connexions</p>
+                    </div>
+                    
+                    <h3 style="margin-bottom: 12px; color: #475569;">📊 Légende</h3>
+                    <div class="legend-grid">
+                        ${Object.entries(groupLabels).map(([key, label]) => `
+                            <div class="legend-item" onclick="setFilter('${key}')">
+                                <div class="legend-dot" style="background: ${groupColors[key]}"></div>
+                                <span class="legend-label">${groupIcons[key]} ${label}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                    
+                    <div class="tips-box">
+                        <h4>💡 Astuces</h4>
+                        <ul>
+                            <li>• Filtrez par catégorie avec les boutons</li>
+                            <li>• Utilisez la recherche pour trouver une techno</li>
+                            <li>• Cliquez sur les tags pour naviguer</li>
+                            <li>• Zoomez avec la molette</li>
+                        </ul>
+                    </div>
+                `;
+            }
+        }
+
+        function selectNodeById(id) {
+            const node = techData.nodes.find(n => n.id === id);
+            if (node) {
+                selectedNode = node;
+                renderSidebar(node);
+                renderGraph(document.getElementById('searchInput').value);
+            }
+        }
+
+        // Init on load
+        window.addEventListener('load', init);
+        window.addEventListener('resize', () => renderGraph(document.getElementById('searchInput').value));
+    </script>
+</body>
+</html>
