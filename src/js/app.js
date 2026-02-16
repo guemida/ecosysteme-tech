@@ -1,7 +1,7 @@
 /**
  * Écosystème Technologique IT - Application JavaScript
  * © 2026 Tous droits réservés
- * Version: 1.0.0
+ * Version: 2.0.0 - Glassmorphism + Dark Mode
  *
  * IMPORTANT: Ce code est protégé par copyright.
  * Toute reproduction non autorisée est interdite.
@@ -22,6 +22,7 @@
         debounceDelay: 300,
         visualDefaults: {
             nodeRadius: 24,
+            nodeHoverRadius: 35,
             linkDistance: 100,
             chargeStrength: -300,
             collisionRadius: 40
@@ -36,16 +37,14 @@
         currentFilter: null,
         selectedNode: null,
         simulation: null,
-        searchTerm: ''
+        searchTerm: '',
+        theme: 'light'
     };
 
     // ========== Utility Functions ==========
 
     /**
      * Debounce function to limit function calls
-     * @param {Function} func - Function to debounce
-     * @param {number} delay - Delay in milliseconds
-     * @returns {Function} Debounced function
      */
     function debounce(func, delay) {
         let timeoutId;
@@ -57,8 +56,6 @@
 
     /**
      * Sanitize HTML to prevent XSS attacks
-     * @param {string} str - String to sanitize
-     * @returns {string} Sanitized string
      */
     function sanitizeHTML(str) {
         const div = document.createElement('div');
@@ -67,14 +64,11 @@
     }
 
     /**
-     * Show error message to user (non-destructive overlay)
-     * @param {string} message - Error message
-     * @param {Error} [error] - Optional error object
+     * Show error message to user
      */
     function showError(message, error) {
         console.error(message, error);
 
-        // Remove any previous error overlay
         const existing = document.getElementById('errorOverlay');
         if (existing) existing.remove();
 
@@ -98,7 +92,7 @@
     }
 
     /**
-     * Show loading indicator (overlay to preserve DOM structure)
+     * Show loading indicator with spinner
      */
     function showLoading() {
         const graphContainer = document.querySelector('.graph-container');
@@ -108,7 +102,7 @@
             loader.id = 'loadingOverlay';
             loader.setAttribute('role', 'status');
             loader.setAttribute('aria-live', 'polite');
-            loader.innerHTML = '<span>Chargement en cours</span>';
+            loader.innerHTML = '<div class="loading-spinner"></div><span>Chargement en cours</span>';
             graphContainer.appendChild(loader);
         }
     }
@@ -121,23 +115,79 @@
         if (loader) loader.remove();
     }
 
+    // ========== Theme Management ==========
+
+    /**
+     * Initialize theme from localStorage or system preference
+     */
+    function initializeTheme() {
+        const saved = localStorage.getItem('theme');
+        if (saved) {
+            appState.theme = saved;
+        } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            appState.theme = 'dark';
+        }
+        applyTheme(appState.theme);
+
+        // Listen for system theme changes
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+            if (!localStorage.getItem('theme')) {
+                appState.theme = e.matches ? 'dark' : 'light';
+                applyTheme(appState.theme);
+            }
+        });
+    }
+
+    /**
+     * Apply theme to document
+     */
+    function applyTheme(theme) {
+        document.documentElement.setAttribute('data-theme', theme);
+        appState.theme = theme;
+
+        // Update meta theme-color
+        const metaTheme = document.querySelector('meta[name="theme-color"]');
+        if (metaTheme) {
+            metaTheme.setAttribute('content', theme === 'dark' ? '#0f172a' : '#3B82F6');
+        }
+    }
+
+    /**
+     * Toggle between light and dark themes
+     */
+    function toggleTheme() {
+        const newTheme = appState.theme === 'dark' ? 'light' : 'dark';
+        applyTheme(newTheme);
+        localStorage.setItem('theme', newTheme);
+
+        // Re-render graph for theme-aware colors
+        if (appState.techData) {
+            renderGraph(appState.searchTerm);
+        }
+    }
+
+    /**
+     * Initialize theme toggle button
+     */
+    function initializeThemeToggle() {
+        const toggleBtn = document.getElementById('themeToggle');
+        if (toggleBtn) {
+            toggleBtn.addEventListener('click', toggleTheme);
+        }
+    }
+
     // ========== Data Loading ==========
 
     /**
      * Load JSON data with error handling
-     * @param {string} url - URL to fetch
-     * @returns {Promise<Object>} Parsed JSON data
      */
     async function loadJSON(url) {
         try {
             const response = await fetch(url);
-
             if (!response.ok) {
                 throw new Error(`HTTP ${response.status}: ${response.statusText}`);
             }
-
-            const data = await response.json();
-            return data;
+            return await response.json();
         } catch (error) {
             throw new Error(`Impossible de charger ${url}: ${error.message}`);
         }
@@ -145,8 +195,6 @@
 
     /**
      * Load all application data
-     * Uses embedded data from data.js (works with file://) with fetch fallback
-     * @returns {Promise<void>}
      */
     async function loadData() {
         try {
@@ -154,13 +202,11 @@
 
             let techData, techLinks, config;
 
-            // Use embedded data if available (works without server)
             if (window.__ECOSYSTEM_DATA__) {
                 techData = window.__ECOSYSTEM_DATA__.techData;
                 techLinks = window.__ECOSYSTEM_DATA__.techLinks;
                 config = window.__ECOSYSTEM_DATA__.config;
             } else {
-                // Fallback to fetch (requires HTTP server)
                 [techData, techLinks, config] = await Promise.all([
                     loadJSON(CONFIG.dataPath),
                     loadJSON(CONFIG.linksPath),
@@ -168,7 +214,6 @@
                 ]);
             }
 
-            // Validate data
             if (!techData || !techData.nodes || !Array.isArray(techData.nodes)) {
                 throw new Error('Format de données invalide');
             }
@@ -177,7 +222,6 @@
                 throw new Error('Format de liens invalide');
             }
 
-            // Store in state
             appState.techData = techData;
             appState.techLinks = techLinks;
             appState.config = config;
@@ -206,13 +250,11 @@
             const { nodes } = appState.techData;
             const { groupLabels, groupIcons, groupColors } = appState.config;
 
-            // Count nodes by group
             const groupCounts = {};
             nodes.forEach(node => {
                 groupCounts[node.group] = (groupCounts[node.group] || 0) + 1;
             });
 
-            // Create "All" button
             let html = `
                 <button
                     class="filter-btn active"
@@ -223,7 +265,6 @@
                 </button>
             `;
 
-            // Create category buttons
             Object.entries(groupLabels).forEach(([key, label]) => {
                 const count = groupCounts[key] || 0;
                 if (count > 0) {
@@ -241,9 +282,12 @@
 
             container.innerHTML = html;
 
-            // Add event listeners
+            // Add event listeners with ripple effect
             container.querySelectorAll('.filter-btn').forEach(btn => {
-                btn.addEventListener('click', (e) => setFilter(e.target.dataset.group));
+                btn.addEventListener('click', (e) => {
+                    createRipple(e);
+                    setFilter(e.target.closest('.filter-btn').dataset.group);
+                });
             });
 
         } catch (error) {
@@ -252,8 +296,26 @@
     }
 
     /**
+     * Create ripple effect on button click
+     */
+    function createRipple(event) {
+        const button = event.currentTarget;
+        const ripple = document.createElement('span');
+        const rect = button.getBoundingClientRect();
+        const size = Math.max(rect.width, rect.height);
+        const x = event.clientX - rect.left - size / 2;
+        const y = event.clientY - rect.top - size / 2;
+
+        ripple.style.width = ripple.style.height = `${size}px`;
+        ripple.style.left = `${x}px`;
+        ripple.style.top = `${y}px`;
+        ripple.className = 'ripple';
+        button.appendChild(ripple);
+        ripple.addEventListener('animationend', () => ripple.remove());
+    }
+
+    /**
      * Set filter and update UI
-     * @param {string|null} group - Group to filter by
      */
     function setFilter(group) {
         try {
@@ -261,7 +323,6 @@
 
             const { groupColors } = appState.config;
 
-            // Update button states
             document.querySelectorAll('.filter-btn').forEach(btn => {
                 const btnGroup = btn.dataset.group;
                 const isActive = btnGroup === group;
@@ -272,11 +333,13 @@
                 if (isActive && group !== 'all' && groupColors[group]) {
                     btn.style.background = groupColors[group];
                     btn.style.color = 'white';
-                    btn.style.borderColor = groupColors[group];
+                    btn.style.borderColor = 'transparent';
+                    btn.style.boxShadow = `0 4px 15px ${groupColors[group]}50`;
                 } else if (!isActive) {
                     btn.style.background = '';
                     btn.style.color = '';
                     btn.style.borderColor = '';
+                    btn.style.boxShadow = '';
                 }
             });
 
@@ -287,8 +350,18 @@
     }
 
     /**
-     * Render the D3 graph
-     * @param {string} searchTerm - Search term for filtering
+     * Helper: lighten a hex color
+     */
+    function lightenColor(hex, percent) {
+        const num = parseInt(hex.replace('#', ''), 16);
+        const r = Math.min(255, (num >> 16) + Math.round(255 * percent / 100));
+        const g = Math.min(255, ((num >> 8) & 0x00FF) + Math.round(255 * percent / 100));
+        const b = Math.min(255, (num & 0x0000FF) + Math.round(255 * percent / 100));
+        return `rgb(${r},${g},${b})`;
+    }
+
+    /**
+     * Render the D3 graph with enhanced visuals
      */
     function renderGraph(searchTerm = '') {
         try {
@@ -303,6 +376,7 @@
             const rect = container.getBoundingClientRect();
             const width = rect.width || 900;
             const height = rect.height || 600;
+            const isDark = appState.theme === 'dark';
 
             // Filter nodes
             const filteredNodes = appState.techData.nodes.filter(node => {
@@ -320,8 +394,54 @@
                 filteredNodeIds.has(link.target.id || link.target)
             );
 
-            // Update stats
-            updateStats(filteredNodes.length, filteredLinks.length);
+            // Update stats with animation
+            animateStats(filteredNodes.length, filteredLinks.length);
+
+            // Create defs for gradients and filters
+            const defs = svg.append('defs');
+
+            // Create glow filter
+            const glowFilter = defs.append('filter')
+                .attr('id', 'glow')
+                .attr('x', '-50%')
+                .attr('y', '-50%')
+                .attr('width', '200%')
+                .attr('height', '200%');
+            glowFilter.append('feGaussianBlur')
+                .attr('stdDeviation', '3')
+                .attr('result', 'coloredBlur');
+            const glowMerge = glowFilter.append('feMerge');
+            glowMerge.append('feMergeNode').attr('in', 'coloredBlur');
+            glowMerge.append('feMergeNode').attr('in', 'SourceGraphic');
+
+            // Node shadow filter
+            const shadowFilter = defs.append('filter')
+                .attr('id', 'nodeShadow')
+                .attr('x', '-30%')
+                .attr('y', '-30%')
+                .attr('width', '160%')
+                .attr('height', '160%');
+            shadowFilter.append('feDropShadow')
+                .attr('dx', '0')
+                .attr('dy', '2')
+                .attr('stdDeviation', '3')
+                .attr('flood-opacity', '0.2');
+
+            // Create radial gradients for each group
+            const { groupColors } = appState.config;
+            Object.entries(groupColors).forEach(([group, color]) => {
+                const gradient = defs.append('radialGradient')
+                    .attr('id', `gradient-${group}`)
+                    .attr('cx', '35%')
+                    .attr('cy', '35%')
+                    .attr('r', '65%');
+                gradient.append('stop')
+                    .attr('offset', '0%')
+                    .attr('stop-color', lightenColor(color, 30));
+                gradient.append('stop')
+                    .attr('offset', '100%')
+                    .attr('stop-color', color);
+            });
 
             // Create graph container
             const graphContainer = svg.append('g');
@@ -332,7 +452,7 @@
                 .on('zoom', (event) => graphContainer.attr('transform', event.transform));
             svg.call(zoom);
 
-            // Copy node data to avoid mutation
+            // Copy node data
             const nodes = filteredNodes.map(d => ({...d}));
             const links = filteredLinks.map(d => ({
                 source: typeof d.source === 'object' ? d.source.id : d.source,
@@ -351,15 +471,18 @@
                 .force('center', d3.forceCenter(width / 2, height / 2))
                 .force('collision', d3.forceCollide().radius(visualDefaults.collisionRadius));
 
-            // Create links
+            // Create links with group-based colors
             const link = graphContainer.append('g')
                 .attr('aria-hidden', 'true')
                 .selectAll('line')
                 .data(links)
                 .join('line')
-                .attr('stroke', '#CBD5E1')
-                .attr('stroke-opacity', 0.5)
-                .attr('stroke-width', d => d.strength * 2);
+                .attr('stroke', d => {
+                    const sourceNode = nodes.find(n => n.id === (typeof d.source === 'object' ? d.source.id : d.source));
+                    return sourceNode ? groupColors[sourceNode.group] : (isDark ? 'rgba(148,163,184,0.4)' : '#CBD5E1');
+                })
+                .attr('stroke-opacity', 0.25)
+                .attr('stroke-width', d => Math.max(1, d.strength * 1.5));
 
             // Create node groups
             const node = graphContainer.append('g')
@@ -370,29 +493,40 @@
                 .attr('role', 'button')
                 .attr('tabindex', '0')
                 .attr('aria-label', d => `Technologie ${d.id}`)
+                .style('opacity', 0)
                 .call(d3.drag()
                     .on('start', dragstarted)
                     .on('drag', dragged)
                     .on('end', dragended));
 
-            // Add circles to nodes
+            // Fade-in animation for nodes
+            node.transition()
+                .delay((d, i) => i * 15)
+                .duration(500)
+                .style('opacity', 1);
+
+            // Add circles with radial gradient
             node.append('circle')
                 .attr('r', visualDefaults.nodeRadius)
-                .attr('fill', d => appState.config.groupColors[d.group])
-                .attr('stroke', '#fff')
+                .attr('fill', d => `url(#gradient-${d.group})`)
+                .attr('stroke', isDark ? 'rgba(255,255,255,0.2)' : '#fff')
                 .attr('stroke-width', 2.5)
-                .attr('opacity', 0.9)
-                .style('filter', 'drop-shadow(0 2px 4px rgba(0,0,0,0.1))');
+                .style('filter', 'url(#nodeShadow)');
 
-            // Add text labels to nodes
+            // Add text labels with background for readability
             node.append('text')
                 .text(d => d.id.length > 12 ? d.id.substring(0, 10) + '...' : d.id)
                 .attr('text-anchor', 'middle')
                 .attr('dy', 38)
                 .attr('font-size', '10px')
                 .attr('font-weight', '600')
-                .attr('fill', '#374151')
+                .attr('fill', isDark ? '#e2e8f0' : '#374151')
                 .style('pointer-events', 'none')
+                .style('paint-order', 'stroke')
+                .style('stroke', isDark ? 'rgba(15,23,42,0.8)' : 'rgba(255,255,255,0.85)')
+                .style('stroke-width', '3px')
+                .style('stroke-linecap', 'round')
+                .style('stroke-linejoin', 'round')
                 .attr('aria-hidden', 'true');
 
             // Add click handlers
@@ -413,18 +547,22 @@
                 }
             });
 
-            // Add hover handlers
+            // Enhanced hover handlers
             node.on('mouseover', (event, d) => {
-                d3.select(event.currentTarget).select('circle')
-                    .transition().duration(200)
-                    .attr('r', 30).attr('stroke-width', 3);
+                const circle = d3.select(event.currentTarget).select('circle');
+                circle.transition().duration(200)
+                    .attr('r', visualDefaults.nodeHoverRadius)
+                    .attr('stroke-width', 3)
+                    .style('filter', `url(#glow) drop-shadow(0 0 8px ${groupColors[d.group]})`);
                 if (!appState.selectedNode) renderSidebar(d);
             });
 
             node.on('mouseout', (event) => {
-                d3.select(event.currentTarget).select('circle')
-                    .transition().duration(200)
-                    .attr('r', visualDefaults.nodeRadius).attr('stroke-width', 2.5);
+                const circle = d3.select(event.currentTarget).select('circle');
+                circle.transition().duration(200)
+                    .attr('r', visualDefaults.nodeRadius)
+                    .attr('stroke-width', 2.5)
+                    .style('filter', 'url(#nodeShadow)');
                 if (!appState.selectedNode) renderSidebar(null);
             });
 
@@ -474,6 +612,7 @@
      */
     function highlightConnections(d, link, node, links) {
         try {
+            const { groupColors } = appState.config;
             const connectedNodes = new Set([d.id]);
 
             links.forEach(l => {
@@ -484,27 +623,30 @@
             });
 
             node.select('circle').transition().duration(300)
-                .attr('opacity', n => connectedNodes.has(n.id) ? 1 : 0.15);
+                .style('opacity', n => connectedNodes.has(n.id) ? 1 : 0.15)
+                .style('filter', n => n.id === d.id
+                    ? `url(#glow) drop-shadow(0 0 10px ${groupColors[d.group]})`
+                    : 'url(#nodeShadow)');
 
             node.select('text').transition().duration(300)
-                .attr('opacity', n => connectedNodes.has(n.id) ? 1 : 0.15);
+                .style('opacity', n => connectedNodes.has(n.id) ? 1 : 0.15);
 
             link.transition().duration(300)
                 .attr('stroke-opacity', l => {
                     const sourceId = typeof l.source === 'object' ? l.source.id : l.source;
                     const targetId = typeof l.target === 'object' ? l.target.id : l.target;
-                    return (sourceId === d.id || targetId === d.id) ? 0.9 : 0.05;
+                    return (sourceId === d.id || targetId === d.id) ? 0.8 : 0.05;
                 })
                 .attr('stroke', l => {
                     const sourceId = typeof l.source === 'object' ? l.source.id : l.source;
                     const targetId = typeof l.target === 'object' ? l.target.id : l.target;
                     return (sourceId === d.id || targetId === d.id) ?
-                        appState.config.groupColors[d.group] : '#CBD5E1';
+                        groupColors[d.group] : (appState.theme === 'dark' ? 'rgba(148,163,184,0.4)' : '#CBD5E1');
                 })
                 .attr('stroke-width', l => {
                     const sourceId = typeof l.source === 'object' ? l.source.id : l.source;
                     const targetId = typeof l.target === 'object' ? l.target.id : l.target;
-                    return (sourceId === d.id || targetId === d.id) ? 3 : l.strength * 2;
+                    return (sourceId === d.id || targetId === d.id) ? 3 : Math.max(1, l.strength * 1.5);
                 });
         } catch (error) {
             console.error('Erreur lors de la mise en évidence:', error);
@@ -516,12 +658,23 @@
      */
     function resetHighlight(link, node) {
         try {
-            node.select('circle').transition().duration(300).attr('opacity', 0.9);
-            node.select('text').transition().duration(300).attr('opacity', 1);
+            const isDark = appState.theme === 'dark';
+            const { groupColors } = appState.config;
+
+            node.select('circle').transition().duration(300)
+                .style('opacity', 1)
+                .style('filter', 'url(#nodeShadow)');
+            node.select('text').transition().duration(300)
+                .style('opacity', 1);
             link.transition().duration(300)
-                .attr('stroke-opacity', 0.5)
-                .attr('stroke', '#CBD5E1')
-                .attr('stroke-width', d => d.strength * 2);
+                .attr('stroke-opacity', 0.25)
+                .attr('stroke', d => {
+                    const nodes = appState.techData.nodes;
+                    const sourceId = typeof d.source === 'object' ? d.source.id : d.source;
+                    const sourceNode = nodes.find(n => n.id === sourceId);
+                    return sourceNode ? groupColors[sourceNode.group] : (isDark ? 'rgba(148,163,184,0.4)' : '#CBD5E1');
+                })
+                .attr('stroke-width', d => Math.max(1, d.strength * 1.5));
         } catch (error) {
             console.error('Erreur lors de la réinitialisation:', error);
         }
@@ -529,8 +682,6 @@
 
     /**
      * Get connected technologies for a node
-     * @param {string} nodeId - Node ID
-     * @returns {Array} Connected nodes
      */
     function getConnectedTechnologies(nodeId) {
         try {
@@ -555,7 +706,6 @@
 
     /**
      * Render sidebar content
-     * @param {Object|null} node - Node data or null for welcome
      */
     function renderSidebar(node) {
         try {
@@ -626,7 +776,6 @@
                     </div>
                 `;
             } else {
-                // Render welcome screen
                 sidebar.innerHTML = `
                     <div class="welcome-box">
                         <div class="icon" aria-hidden="true">👆</div>
@@ -634,7 +783,7 @@
                         <p>Cliquez sur une technologie pour voir ses détails et connexions</p>
                     </div>
 
-                    <h3 style="margin-bottom: 12px; color: var(--color-slate-600);">📊 Légende</h3>
+                    <h3 style="margin-bottom: 12px; color: var(--text-secondary);">📊 Légende</h3>
                     <div class="legend-grid" role="list">
                         ${Object.entries(groupLabels).map(([key, label]) => {
                             const count = appState.techData.nodes.filter(n => n.group === key).length;
@@ -661,6 +810,7 @@
                             <li role="listitem">• Utilisez la recherche pour trouver une techno</li>
                             <li role="listitem">• Cliquez sur les tags pour naviguer</li>
                             <li role="listitem">• Zoomez avec la molette</li>
+                            <li role="listitem">• Basculez en mode sombre avec 🌙</li>
                         </ul>
                     </div>
                 `;
@@ -672,7 +822,6 @@
 
     /**
      * Select node by ID (public method)
-     * @param {string} id - Node ID
      */
     function selectNodeById(id) {
         try {
@@ -693,20 +842,56 @@
     }
 
     /**
-     * Update stats display
-     * @param {number} nodeCount - Number of nodes
-     * @param {number} linkCount - Number of links
+     * Animate stats update with counter effect
      */
-    function updateStats(nodeCount, linkCount) {
+    function animateStats(nodeCount, linkCount) {
         try {
             const nodeCountEl = document.getElementById('nodeCount');
             const linkCountEl = document.getElementById('linkCount');
 
-            if (nodeCountEl) nodeCountEl.textContent = nodeCount;
-            if (linkCountEl) linkCountEl.textContent = linkCount;
+            if (nodeCountEl) {
+                const oldValue = parseInt(nodeCountEl.textContent) || 0;
+                if (oldValue !== nodeCount) {
+                    nodeCountEl.classList.add('animating');
+                    animateValue(nodeCountEl, oldValue, nodeCount, 400);
+                    setTimeout(() => nodeCountEl.classList.remove('animating'), 400);
+                }
+            }
+
+            if (linkCountEl) {
+                const oldValue = parseInt(linkCountEl.textContent) || 0;
+                if (oldValue !== linkCount) {
+                    linkCountEl.classList.add('animating');
+                    animateValue(linkCountEl, oldValue, linkCount, 400);
+                    setTimeout(() => linkCountEl.classList.remove('animating'), 400);
+                }
+            }
         } catch (error) {
             console.error('Erreur lors de la mise à jour des stats:', error);
         }
+    }
+
+    /**
+     * Animate a numeric value change
+     */
+    function animateValue(element, start, end, duration) {
+        const startTime = performance.now();
+        const diff = end - start;
+
+        function update(currentTime) {
+            const elapsed = currentTime - startTime;
+            const progress = Math.min(elapsed / duration, 1);
+            // Ease out quad
+            const eased = 1 - (1 - progress) * (1 - progress);
+            const current = Math.round(start + diff * eased);
+            element.textContent = current;
+
+            if (progress < 1) {
+                requestAnimationFrame(update);
+            }
+        }
+
+        requestAnimationFrame(update);
     }
 
     /**
@@ -719,7 +904,6 @@
                 throw new Error('Input de recherche introuvable');
             }
 
-            // Debounced search handler
             const debouncedSearch = debounce((value) => {
                 appState.searchTerm = value;
                 renderGraph(value);
@@ -749,6 +933,10 @@
      */
     async function init() {
         try {
+            // Initialize theme first (before any rendering)
+            initializeTheme();
+            initializeThemeToggle();
+
             // Check D3.js availability
             if (typeof d3 === 'undefined') {
                 showError('La bibliothèque D3.js n\'a pas pu être chargée. Vérifiez votre connexion internet.');

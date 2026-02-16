@@ -88,16 +88,26 @@
                 <h1>🎓 Écosystème Technologique IT</h1>
                 <p>Cliquez pour explorer les connexions • Molette pour zoomer • Glissez pour déplacer</p>
             </div>
-            <div class="search-container">
-                <label for="searchInput" class="visually-hidden">Rechercher une technologie</label>
-                <input
-                    type="search"
-                    class="search-box"
-                    placeholder="🔍 Rechercher..."
-                    id="searchInput"
-                    aria-label="Rechercher une technologie"
-                    autocomplete="off"
-                    role="searchbox">
+            <div class="header-actions">
+                <div class="search-container">
+                    <label for="searchInput" class="visually-hidden">Rechercher une technologie</label>
+                    <input
+                        type="search"
+                        class="search-box"
+                        placeholder="🔍 Rechercher..."
+                        id="searchInput"
+                        aria-label="Rechercher une technologie"
+                        autocomplete="off"
+                        role="searchbox">
+                </div>
+                <button
+                    class="theme-toggle"
+                    id="themeToggle"
+                    aria-label="Basculer le mode sombre"
+                    title="Basculer le mode sombre">
+                    <span class="icon-sun" aria-hidden="true">☀️</span>
+                    <span class="icon-moon" aria-hidden="true">🌙</span>
+                </button>
             </div>
         </div>
         <nav class="filters" id="filterButtons" role="navigation" aria-label="Filtres par catégorie"></nav>
