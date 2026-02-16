@@ -67,41 +67,58 @@
     }
 
     /**
-     * Show error message to user
+     * Show error message to user (non-destructive overlay)
      * @param {string} message - Error message
      * @param {Error} [error] - Optional error object
      */
     function showError(message, error) {
         console.error(message, error);
 
-        const mainContainer = document.querySelector('.main-container');
-        if (mainContainer) {
-            mainContainer.innerHTML = `
-                <div class="error" role="alert">
-                    <h2>Une erreur est survenue</h2>
-                    <p>${sanitizeHTML(message)}</p>
-                    <p style="margin-top: 1rem;">
-                        <button onclick="location.reload()" class="filter-btn">
-                            Recharger la page
-                        </button>
-                    </p>
-                </div>
+        // Remove any previous error overlay
+        const existing = document.getElementById('errorOverlay');
+        if (existing) existing.remove();
+
+        const graphContainer = document.querySelector('.graph-container');
+        if (graphContainer) {
+            const errorDiv = document.createElement('div');
+            errorDiv.id = 'errorOverlay';
+            errorDiv.className = 'error';
+            errorDiv.setAttribute('role', 'alert');
+            errorDiv.innerHTML = `
+                <h2>Une erreur est survenue</h2>
+                <p>${sanitizeHTML(message)}</p>
+                <p style="margin-top: 1rem;">
+                    <button onclick="location.reload()" class="filter-btn">
+                        Recharger la page
+                    </button>
+                </p>
             `;
+            graphContainer.appendChild(errorDiv);
         }
     }
 
     /**
-     * Show loading indicator
+     * Show loading indicator (overlay to preserve DOM structure)
      */
     function showLoading() {
-        const mainContainer = document.querySelector('.main-container');
-        if (mainContainer) {
-            mainContainer.innerHTML = `
-                <div class="loading" role="status" aria-live="polite">
-                    <span>Chargement en cours</span>
-                </div>
-            `;
+        const graphContainer = document.querySelector('.graph-container');
+        if (graphContainer) {
+            const loader = document.createElement('div');
+            loader.className = 'loading';
+            loader.id = 'loadingOverlay';
+            loader.setAttribute('role', 'status');
+            loader.setAttribute('aria-live', 'polite');
+            loader.innerHTML = '<span>Chargement en cours</span>';
+            graphContainer.appendChild(loader);
         }
+    }
+
+    /**
+     * Hide loading indicator
+     */
+    function hideLoading() {
+        const loader = document.getElementById('loadingOverlay');
+        if (loader) loader.remove();
     }
 
     // ========== Data Loading ==========
@@ -128,18 +145,28 @@
 
     /**
      * Load all application data
+     * Uses embedded data from data.js (works with file://) with fetch fallback
      * @returns {Promise<void>}
      */
     async function loadData() {
         try {
             showLoading();
 
-            // Load all data in parallel for better performance
-            const [techData, techLinks, config] = await Promise.all([
-                loadJSON(CONFIG.dataPath),
-                loadJSON(CONFIG.linksPath),
-                loadJSON(CONFIG.configPath)
-            ]);
+            let techData, techLinks, config;
+
+            // Use embedded data if available (works without server)
+            if (window.__ECOSYSTEM_DATA__) {
+                techData = window.__ECOSYSTEM_DATA__.techData;
+                techLinks = window.__ECOSYSTEM_DATA__.techLinks;
+                config = window.__ECOSYSTEM_DATA__.config;
+            } else {
+                // Fallback to fetch (requires HTTP server)
+                [techData, techLinks, config] = await Promise.all([
+                    loadJSON(CONFIG.dataPath),
+                    loadJSON(CONFIG.linksPath),
+                    loadJSON(CONFIG.configPath)
+                ]);
+            }
 
             // Validate data
             if (!techData || !techData.nodes || !Array.isArray(techData.nodes)) {
@@ -155,8 +182,10 @@
             appState.techLinks = techLinks;
             appState.config = config;
 
+            hideLoading();
             return { techData, techLinks, config };
         } catch (error) {
+            hideLoading();
             showError('Erreur lors du chargement des données', error);
             throw error;
         }
@@ -720,6 +749,12 @@
      */
     async function init() {
         try {
+            // Check D3.js availability
+            if (typeof d3 === 'undefined') {
+                showError('La bibliothèque D3.js n\'a pas pu être chargée. Vérifiez votre connexion internet.');
+                return;
+            }
+
             // Load data
             await loadData();
 
