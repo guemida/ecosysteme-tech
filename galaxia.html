@@ -1,0 +1,1262 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Galaxia — Maquette Interactive</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-deep: #06080f;
+    --bg-surface: #0c1020;
+    --bg-card: #111630;
+    --bg-card-hover: #161d40;
+    --border-subtle: rgba(100, 120, 200, 0.12);
+    --border-active: rgba(100, 150, 255, 0.3);
+    --text-primary: #e8ecf8;
+    --text-secondary: #8890b0;
+    --text-muted: #555e80;
+    --accent-tech: #3b82f6;
+    --accent-tech-glow: rgba(59, 130, 246, 0.25);
+    --accent-metier: #f59e0b;
+    --accent-metier-glow: rgba(245, 158, 11, 0.25);
+    --accent-soft: #10b981;
+    --accent-soft-glow: rgba(16, 185, 129, 0.25);
+    --radius: 12px;
+    --radius-sm: 8px;
+    --transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Outfit', sans-serif;
+    background: var(--bg-deep);
+    color: var(--text-primary);
+    overflow: hidden;
+    height: 100vh;
+    width: 100vw;
+  }
+
+  /* ══════════════ HEADER ══════════════ */
+  .header {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 24px; height: 60px;
+    background: rgba(6, 8, 15, 0.85);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border-subtle);
+  }
+
+  .logo {
+    display: flex; align-items: center; gap: 10px;
+    font-family: 'Space Mono', monospace;
+    font-size: 18px; font-weight: 700;
+    letter-spacing: 2px; text-transform: uppercase;
+  }
+  .logo-dot {
+    width: 10px; height: 10px; border-radius: 50%;
+    background: var(--accent-tech);
+    box-shadow: 0 0 12px var(--accent-tech-glow);
+    animation: pulse-dot 2s ease-in-out infinite;
+  }
+  @keyframes pulse-dot {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.3); opacity: 0.7; }
+  }
+
+  /* Search */
+  .search-container {
+    position: relative; width: 320px;
+  }
+  .search-input {
+    width: 100%; padding: 8px 16px 8px 38px;
+    background: var(--bg-surface);
+    border: 1px solid var(--border-subtle);
+    border-radius: 24px;
+    color: var(--text-primary);
+    font-family: 'Outfit', sans-serif;
+    font-size: 14px;
+    outline: none;
+    transition: var(--transition);
+  }
+  .search-input::placeholder { color: var(--text-muted); }
+  .search-input:focus {
+    border-color: var(--border-active);
+    background: var(--bg-card);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.08);
+  }
+  .search-icon {
+    position: absolute; left: 12px; top: 50%; transform: translateY(-50%);
+    color: var(--text-muted); font-size: 14px; pointer-events: none;
+  }
+  .search-results {
+    position: absolute; top: calc(100% + 6px); left: 0; right: 0;
+    background: var(--bg-card);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-sm);
+    max-height: 300px; overflow-y: auto;
+    display: none; z-index: 200;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.5);
+  }
+  .search-results.active { display: block; }
+  .search-result-item {
+    padding: 10px 14px; cursor: pointer;
+    display: flex; align-items: center; gap: 10px;
+    border-bottom: 1px solid var(--border-subtle);
+    transition: var(--transition);
+  }
+  .search-result-item:last-child { border-bottom: none; }
+  .search-result-item:hover { background: var(--bg-card-hover); }
+  .search-result-dot {
+    width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
+  }
+  .search-result-name { font-size: 13px; font-weight: 500; }
+  .search-result-galaxy { font-size: 11px; color: var(--text-muted); margin-left: auto; }
+
+  /* Persona switch */
+  .persona-switch {
+    display: flex; gap: 4px;
+    background: var(--bg-surface);
+    padding: 3px; border-radius: 24px;
+    border: 1px solid var(--border-subtle);
+  }
+  .persona-btn {
+    padding: 6px 16px;
+    border: none; border-radius: 20px;
+    background: transparent;
+    color: var(--text-secondary);
+    font-family: 'Outfit', sans-serif;
+    font-size: 13px; font-weight: 500;
+    cursor: pointer;
+    transition: var(--transition);
+  }
+  .persona-btn:hover { color: var(--text-primary); }
+  .persona-btn.active {
+    background: var(--bg-card);
+    color: var(--text-primary);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+  }
+
+  /* ══════════════ MAIN AREA ══════════════ */
+  .main {
+    position: relative;
+    width: 100%; height: 100vh;
+    padding-top: 60px;
+  }
+
+  /* Galaxy legend */
+  .galaxy-legend {
+    position: fixed; top: 76px; left: 24px; z-index: 50;
+    display: flex; flex-direction: column; gap: 6px;
+  }
+  .legend-item {
+    display: flex; align-items: center; gap: 8px;
+    padding: 6px 14px;
+    background: rgba(12, 16, 32, 0.8);
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--border-subtle);
+    border-radius: 20px;
+    font-size: 12px; font-weight: 500;
+    cursor: pointer;
+    transition: var(--transition);
+    user-select: none;
+  }
+  .legend-item:hover { background: var(--bg-card); }
+  .legend-item.dimmed { opacity: 0.35; }
+  .legend-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+  }
+  .legend-count {
+    color: var(--text-muted); font-size: 11px; margin-left: 4px;
+    font-family: 'Space Mono', monospace;
+  }
+
+  /* Stats bar */
+  .stats-bar {
+    position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 50;
+    display: flex; gap: 24px;
+    padding: 10px 28px;
+    background: rgba(12, 16, 32, 0.85);
+    backdrop-filter: blur(20px);
+    border: 1px solid var(--border-subtle);
+    border-radius: 30px;
+    font-size: 12px; color: var(--text-secondary);
+  }
+  .stat-item { display: flex; align-items: center; gap: 6px; }
+  .stat-value {
+    font-family: 'Space Mono', monospace;
+    font-weight: 700; color: var(--text-primary);
+  }
+
+  /* ══════════════ SVG CANVAS ══════════════ */
+  #graph-canvas {
+    width: 100%; height: 100%;
+    cursor: grab;
+  }
+  #graph-canvas:active { cursor: grabbing; }
+
+  /* Stars background */
+  .star {
+    fill: white; opacity: 0;
+    animation: twinkle linear infinite;
+  }
+  @keyframes twinkle {
+    0%, 100% { opacity: 0.1; }
+    50% { opacity: 0.5; }
+  }
+
+  /* ══════════════ SIDE PANEL ══════════════ */
+  .side-panel {
+    position: fixed; top: 60px; right: 0; bottom: 0;
+    width: 400px;
+    background: var(--bg-surface);
+    border-left: 1px solid var(--border-subtle);
+    transform: translateX(100%);
+    transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 90;
+    overflow-y: auto;
+    display: flex; flex-direction: column;
+  }
+  .side-panel.open { transform: translateX(0); }
+
+  .panel-header {
+    padding: 24px 24px 16px;
+    border-bottom: 1px solid var(--border-subtle);
+    position: relative;
+  }
+  .panel-close {
+    position: absolute; top: 16px; right: 16px;
+    width: 32px; height: 32px;
+    border: 1px solid var(--border-subtle); border-radius: 8px;
+    background: var(--bg-card);
+    color: var(--text-secondary);
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px;
+    transition: var(--transition);
+  }
+  .panel-close:hover { background: var(--bg-card-hover); color: var(--text-primary); }
+
+  .panel-galaxy-tag {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 4px 10px; border-radius: 12px;
+    font-size: 11px; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 1px;
+    margin-bottom: 12px;
+  }
+  .panel-galaxy-tag.tech { background: rgba(59,130,246,0.12); color: var(--accent-tech); }
+  .panel-galaxy-tag.metier { background: rgba(245,158,11,0.12); color: var(--accent-metier); }
+  .panel-galaxy-tag.soft { background: rgba(16,185,129,0.12); color: var(--accent-soft); }
+
+  .panel-title {
+    font-size: 22px; font-weight: 700;
+    margin-bottom: 4px;
+  }
+
+  .panel-body { padding: 20px 24px; flex: 1; }
+
+  /* Tabs for description levels */
+  .level-tabs {
+    display: flex; gap: 4px; margin-bottom: 16px;
+    background: var(--bg-card); padding: 3px; border-radius: 10px;
+  }
+  .level-tab {
+    flex: 1; padding: 7px 0; text-align: center;
+    border: none; border-radius: 8px;
+    background: transparent;
+    color: var(--text-muted);
+    font-family: 'Outfit', sans-serif;
+    font-size: 12px; font-weight: 500;
+    cursor: pointer;
+    transition: var(--transition);
+  }
+  .level-tab:hover { color: var(--text-secondary); }
+  .level-tab.active {
+    background: var(--bg-card-hover);
+    color: var(--text-primary);
+    box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+  }
+
+  .description-text {
+    font-size: 14px; line-height: 1.7;
+    color: var(--text-secondary);
+    margin-bottom: 20px;
+  }
+
+  /* Specific data section */
+  .section-title {
+    font-size: 11px; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 1.5px;
+    color: var(--text-muted);
+    margin-bottom: 10px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--border-subtle);
+  }
+
+  .data-grid {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 8px; margin-bottom: 20px;
+  }
+  .data-card {
+    padding: 10px 12px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-sm);
+  }
+  .data-label {
+    font-size: 10px; text-transform: uppercase; letter-spacing: 1px;
+    color: var(--text-muted); margin-bottom: 4px;
+  }
+  .data-value {
+    font-size: 13px; font-weight: 600; color: var(--text-primary);
+  }
+
+  /* Taught in */
+  .taught-in-item {
+    padding: 8px 12px; margin-bottom: 6px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-sm);
+    font-size: 12px;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .taught-level {
+    font-family: 'Space Mono', monospace;
+    font-weight: 700; font-size: 12px;
+  }
+  .taught-depth {
+    padding: 2px 8px; border-radius: 10px;
+    font-size: 10px; font-weight: 600;
+  }
+  .depth-decouverte { background: rgba(16,185,129,0.12); color: var(--accent-soft); }
+  .depth-avance { background: rgba(245,158,11,0.12); color: var(--accent-metier); }
+  .depth-expert { background: rgba(239,68,68,0.12); color: #ef4444; }
+
+  /* Connections list */
+  .connection-item {
+    display: flex; align-items: center; gap: 8px;
+    padding: 7px 0;
+    border-bottom: 1px solid var(--border-subtle);
+    cursor: pointer;
+    transition: var(--transition);
+  }
+  .connection-item:hover { padding-left: 6px; }
+  .connection-item:last-child { border-bottom: none; }
+  .connection-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+  .connection-name { font-size: 13px; font-weight: 500; }
+  .connection-strength {
+    margin-left: auto; font-size: 10px;
+    font-family: 'Space Mono', monospace;
+    color: var(--text-muted);
+  }
+
+  /* Resources */
+  .resource-link {
+    display: flex; align-items: center; gap: 8px;
+    padding: 8px 12px; margin-bottom: 6px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-sm);
+    font-size: 13px; color: var(--accent-tech);
+    text-decoration: none;
+    transition: var(--transition);
+  }
+  .resource-link:hover {
+    background: var(--bg-card-hover);
+    border-color: var(--border-active);
+  }
+
+  /* Salary badge */
+  .salary-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px;
+    margin-bottom: 20px;
+  }
+  .salary-card {
+    text-align: center; padding: 10px 6px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-sm);
+  }
+  .salary-label { font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+  .salary-value { font-size: 15px; font-weight: 700; color: var(--accent-metier); margin-top: 4px; }
+
+  /* Keyboard hint */
+  .keyboard-hint {
+    position: fixed; bottom: 20px; right: 24px; z-index: 50;
+    font-size: 11px; color: var(--text-muted);
+    display: flex; flex-direction: column; gap: 3px; text-align: right;
+  }
+  kbd {
+    display: inline-block; padding: 1px 6px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-subtle);
+    border-radius: 4px;
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+  }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border-subtle); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+</style>
+</head>
+<body>
+
+<!-- ══════════════ HEADER ══════════════ -->
+<header class="header">
+  <div class="logo">
+    <div class="logo-dot"></div>
+    <span>Galaxia</span>
+  </div>
+
+  <div class="search-container">
+    <span class="search-icon">⌕</span>
+    <input type="text" class="search-input" placeholder="Rechercher une techno, un métier, un skill..." id="searchInput">
+    <div class="search-results" id="searchResults"></div>
+  </div>
+
+  <div class="persona-switch">
+    <button class="persona-btn" data-persona="commercial" onclick="switchPersona('commercial')">🏢 Commercial</button>
+    <button class="persona-btn active" data-persona="etudiant" onclick="switchPersona('etudiant')">🎓 Étudiant</button>
+    <button class="persona-btn" data-persona="prospect" onclick="switchPersona('prospect')">🧭 Prospect</button>
+  </div>
+</header>
+
+<!-- ══════════════ GALAXY LEGEND ══════════════ -->
+<div class="galaxy-legend" id="galaxyLegend"></div>
+
+<!-- ══════════════ MAIN GRAPH ══════════════ -->
+<div class="main">
+  <svg id="graph-canvas"></svg>
+</div>
+
+<!-- ══════════════ STATS BAR ══════════════ -->
+<div class="stats-bar">
+  <div class="stat-item"><span>Nœuds</span> <span class="stat-value" id="statNodes">0</span></div>
+  <div class="stat-item"><span>Liens</span> <span class="stat-value" id="statLinks">0</span></div>
+  <div class="stat-item"><span>Galaxies</span> <span class="stat-value">3</span></div>
+  <div class="stat-item"><span>Instance</span> <span class="stat-value" style="color:var(--accent-tech)">École IT</span></div>
+</div>
+
+<!-- ══════════════ KEYBOARD HINTS ══════════════ -->
+<div class="keyboard-hint">
+  <span><kbd>Scroll</kbd> Zoom</span>
+  <span><kbd>Click</kbd> Détail</span>
+  <span><kbd>Esc</kbd> Fermer</span>
+</div>
+
+<!-- ══════════════ SIDE PANEL ══════════════ -->
+<div class="side-panel" id="sidePanel">
+  <div class="panel-header">
+    <button class="panel-close" onclick="closePanel()">✕</button>
+    <div class="panel-galaxy-tag" id="panelTag"></div>
+    <div class="panel-title" id="panelTitle"></div>
+  </div>
+  <div class="panel-body" id="panelBody"></div>
+</div>
+
+<script>
+// ══════════════════════════════════════════════
+//  DATA — Échantillon réaliste Galaxia École IT
+// ══════════════════════════════════════════════
+
+const galaxies = [
+  { id: 'tech', name: 'Technologies', color: '#3b82f6', icon: '🚀' },
+  { id: 'metier', name: 'Métiers', color: '#f59e0b', icon: '💼' },
+  { id: 'soft', name: 'Soft Skills', color: '#10b981', icon: '🧠' },
+];
+
+const nodes = [
+  // ── Technologies ──
+  { id: 'html', name: 'HTML', galaxy: 'tech', icon: '🌐',
+    desc1: 'Le langage qui structure toutes les pages web. C\'est le squelette de tout site internet — sans HTML, rien ne s\'affiche.',
+    desc2: 'Langage de balisage pour structurer le contenu web. Sémantique HTML5, formulaires, accessibilité ARIA, SEO technique.',
+    desc3: 'Maîtrise des Web Components, Shadow DOM, Custom Elements, templates, microdata, bonnes pratiques WAI-ARIA, performance de rendu.',
+    specific: { difficulty: 'Débutant', learn_time: '2-3 semaines', market_share: 'Universel', use_cases: ['Sites web', 'Apps web', 'Emails'] },
+    taught_in: [{ level: 'B1', semester: 'S1', module: 'Fondamentaux Web', depth: 'Découverte' }],
+    resources: [{ title: 'MDN Web Docs', url: 'https://developer.mozilla.org' }, { title: 'W3Schools', url: 'https://w3schools.com' }]
+  },
+  { id: 'css', name: 'CSS', galaxy: 'tech', icon: '🎨',
+    desc1: 'Le langage qui donne du style aux pages web — couleurs, mises en page, animations. C\'est ce qui rend un site beau.',
+    desc2: 'Langage de mise en forme. Flexbox, Grid, animations, responsive design, préprocesseurs (Sass), méthodologies (BEM).',
+    desc3: 'Architecture CSS à l\'échelle, CSS-in-JS, Houdini API, Container Queries, Cascade Layers, optimisation du Critical CSS.',
+    specific: { difficulty: 'Débutant', learn_time: '1-2 mois', market_share: 'Universel', use_cases: ['Mise en page', 'Animations', 'Responsive'] },
+    taught_in: [{ level: 'B1', semester: 'S1', module: 'Fondamentaux Web', depth: 'Découverte' }, { level: 'B2', semester: 'S3', module: 'UI/UX Design', depth: 'Avancé' }],
+    resources: [{ title: 'CSS-Tricks', url: 'https://css-tricks.com' }]
+  },
+  { id: 'js', name: 'JavaScript', galaxy: 'tech', icon: '⚡',
+    desc1: 'LE langage de programmation du web. Il rend les pages interactives — boutons, formulaires, animations, jeux, tout.',
+    desc2: 'Langage de programmation côté client et serveur. ES6+, async/await, DOM manipulation, modules, closures, prototypes.',
+    desc3: 'Event loop en détail, V8 internals, patterns avancés (proxy, reflect), memory management, Web Workers, WASM interop.',
+    specific: { difficulty: 'Intermédiaire', learn_time: '2-4 mois', market_share: '#1 mondial', use_cases: ['Front-end', 'Back-end', 'Mobile', 'Desktop'] },
+    taught_in: [{ level: 'B1', semester: 'S2', module: 'Programmation Web', depth: 'Découverte' }, { level: 'B2', semester: 'S3', module: 'Dev Front-end', depth: 'Avancé' }],
+    resources: [{ title: 'JavaScript.info', url: 'https://javascript.info' }]
+  },
+  { id: 'react', name: 'React', galaxy: 'tech', icon: '⚛️',
+    desc1: 'Un outil (framework) pour créer des interfaces web modernes et interactives. Utilisé par Facebook, Netflix, Airbnb.',
+    desc2: 'Bibliothèque UI de Meta. Composants, hooks, state management, virtual DOM, JSX. Écosystème riche (Next.js, React Native).',
+    desc3: 'Fiber architecture, concurrent mode, server components, custom hooks avancés, performance profiling, testing patterns.',
+    specific: { difficulty: 'Intermédiaire', learn_time: '1-2 mois', market_share: '#1 framework', use_cases: ['Apps modernes', 'Dashboards', 'E-commerce'] },
+    taught_in: [{ level: 'B2', semester: 'S4', module: 'Dev Front-end', depth: 'Découverte' }, { level: 'B3', semester: 'S5', module: 'Projet Full-Stack', depth: 'Avancé' }],
+    resources: [{ title: 'React.dev', url: 'https://react.dev' }, { title: 'Cours OpenClassrooms', url: 'https://openclassrooms.com' }]
+  },
+  { id: 'node', name: 'Node.js', galaxy: 'tech', icon: '🟢',
+    desc1: 'Permet d\'utiliser JavaScript côté serveur. C\'est ce qui fait tourner l\'arrière-boutique des applications web.',
+    desc2: 'Runtime JavaScript côté serveur. Event-driven, non-blocking I/O. Express.js, APIs REST, microservices.',
+    desc3: 'Cluster module, stream API, performance tuning, native addons (N-API), diagnostics, APM.',
+    specific: { difficulty: 'Intermédiaire', learn_time: '1-2 mois', market_share: 'Top 3 back-end', use_cases: ['APIs', 'Microservices', 'Real-time'] },
+    taught_in: [{ level: 'B2', semester: 'S4', module: 'Dev Back-end', depth: 'Découverte' }, { level: 'B3', semester: 'S5', module: 'Projet Full-Stack', depth: 'Avancé' }],
+    resources: [{ title: 'Node.js Docs', url: 'https://nodejs.org' }]
+  },
+  { id: 'python', name: 'Python', galaxy: 'tech', icon: '🐍',
+    desc1: 'Un langage de programmation très populaire, connu pour être facile à lire. Utilisé en data science, IA, web, automation.',
+    desc2: 'Langage polyvalent. Django, Flask pour le web. Pandas, NumPy pour la data. TensorFlow, PyTorch pour l\'IA.',
+    desc3: 'Metaclasses, descriptors, GIL internals, C extensions, async patterns avancés, packaging et distribution.',
+    specific: { difficulty: 'Débutant', learn_time: '1-3 mois', market_share: '#1 popularité', use_cases: ['Data', 'IA', 'Web', 'Scripting'] },
+    taught_in: [{ level: 'B1', semester: 'S1', module: 'Intro Programmation', depth: 'Découverte' }, { level: 'B3', semester: 'S5', module: 'Data Science', depth: 'Avancé' }],
+    resources: [{ title: 'Python.org', url: 'https://python.org' }]
+  },
+  { id: 'django', name: 'Django', galaxy: 'tech', icon: '🎸',
+    desc1: 'Un framework Python pour créer des sites web rapidement et proprement. Instagram et Spotify l\'utilisent.',
+    desc2: 'Framework web Python "batteries included". ORM, auth, admin, REST Framework. MVT architecture.',
+    desc3: 'Custom middleware, signals, multi-DB routing, django-tenants, async views, custom management commands, query optimization.',
+    specific: { difficulty: 'Intermédiaire', learn_time: '2-3 mois', market_share: 'Top 3 Python web', use_cases: ['Apps web', 'APIs', 'CMS', 'Multi-tenant'] },
+    taught_in: [{ level: 'B3', semester: 'S5', module: 'Projet Full-Stack', depth: 'Avancé' }, { level: 'M1', semester: 'S7', module: 'Architecture Web', depth: 'Expert' }],
+    resources: [{ title: 'Django Docs', url: 'https://djangoproject.com' }, { title: 'Django REST Framework', url: 'https://django-rest-framework.org' }]
+  },
+  { id: 'postgresql', name: 'PostgreSQL', galaxy: 'tech', icon: '🐘',
+    desc1: 'Une base de données — l\'endroit où les applications stockent toutes leurs informations de manière organisée.',
+    desc2: 'SGBD relationnel open-source. ACID, JSON fields, full-text search, triggers, vues matérialisées, extensions.',
+    desc3: 'Partitioning, replication, PL/pgSQL, query planning, MVCC internals, pg_stat, extensions custom.',
+    specific: { difficulty: 'Intermédiaire', learn_time: '1-2 mois', market_share: '#1 open-source DB', use_cases: ['Apps web', 'Data', 'GIS', 'Multi-tenant'] },
+    taught_in: [{ level: 'B2', semester: 'S3', module: 'Bases de données', depth: 'Découverte' }, { level: 'M1', semester: 'S7', module: 'Architecture Data', depth: 'Expert' }],
+    resources: [{ title: 'PostgreSQL Docs', url: 'https://postgresql.org' }]
+  },
+  { id: 'docker', name: 'Docker', galaxy: 'tech', icon: '🐳',
+    desc1: 'Un outil qui "emballe" une application avec tout ce dont elle a besoin pour fonctionner partout, comme un container de transport.',
+    desc2: 'Conteneurisation. Dockerfile, docker-compose, volumes, networking. Isolation, reproductibilité, CI/CD.',
+    desc3: 'Multi-stage builds, security hardening, orchestration (Swarm), custom registries, rootless containers, BuildKit.',
+    specific: { difficulty: 'Intermédiaire', learn_time: '2-4 semaines', market_share: 'Standard industrie', use_cases: ['DevOps', 'CI/CD', 'Microservices'] },
+    taught_in: [{ level: 'B3', semester: 'S5', module: 'Infrastructure', depth: 'Découverte' }, { level: 'M1', semester: 'S7', module: 'DevOps', depth: 'Avancé' }],
+    resources: [{ title: 'Docker Docs', url: 'https://docs.docker.com' }]
+  },
+  { id: 'kubernetes', name: 'Kubernetes', galaxy: 'tech', icon: '☸️',
+    desc1: 'Un outil qui gère automatiquement des dizaines de containers Docker. Indispensable quand une application grandit.',
+    desc2: 'Orchestrateur de conteneurs. Pods, services, deployments, ingress. Scaling auto, self-healing, rolling updates.',
+    desc3: 'Custom operators, CRDs, service mesh (Istio), GitOps (ArgoCD), security policies, multi-cluster, eBPF.',
+    specific: { difficulty: 'Avancé', learn_time: '3-6 mois', market_share: 'Standard cloud', use_cases: ['Cloud', 'Microservices', 'Scale'] },
+    taught_in: [{ level: 'M1', semester: 'S7', module: 'Infrastructure Cloud', depth: 'Avancé' }, { level: 'M2', semester: 'S9', module: 'Architecture Distribuée', depth: 'Expert' }],
+    resources: [{ title: 'Kubernetes Docs', url: 'https://kubernetes.io' }]
+  },
+  { id: 'git', name: 'Git', galaxy: 'tech', icon: '📝',
+    desc1: 'L\'outil qui permet à plusieurs développeurs de travailler ensemble sur le même code sans se marcher dessus.',
+    desc2: 'Système de versioning distribué. Branches, merge, rebase, stash, hooks. GitHub/GitLab workflows.',
+    desc3: 'Git internals (objects, packfiles), custom hooks, subtrees, worktrees, bisect, reflog recovery.',
+    specific: { difficulty: 'Débutant', learn_time: '1-2 semaines', market_share: 'Standard universel', use_cases: ['Versioning', 'Collaboration', 'CI/CD'] },
+    taught_in: [{ level: 'B1', semester: 'S1', module: 'Outils Dev', depth: 'Découverte' }],
+    resources: [{ title: 'Git Book', url: 'https://git-scm.com/book' }]
+  },
+  { id: 'typescript', name: 'TypeScript', galaxy: 'tech', icon: '🔷',
+    desc1: 'Une version améliorée de JavaScript qui aide à éviter les erreurs. Très demandé en entreprise.',
+    desc2: 'Superset typé de JavaScript. Types, interfaces, generics, enums, decorators. Compilation vers JS.',
+    desc3: 'Conditional types, mapped types, template literal types, declaration merging, module augmentation, compiler API.',
+    specific: { difficulty: 'Intermédiaire', learn_time: '1 mois', market_share: 'Standard front-end', use_cases: ['Front-end', 'Back-end', 'Librairies'] },
+    taught_in: [{ level: 'B2', semester: 'S4', module: 'Dev Front-end', depth: 'Découverte' }, { level: 'B3', semester: 'S6', module: 'Projet Full-Stack', depth: 'Avancé' }],
+    resources: [{ title: 'TypeScript Handbook', url: 'https://typescriptlang.org' }]
+  },
+  { id: 'mongodb', name: 'MongoDB', galaxy: 'tech', icon: '🍃',
+    desc1: 'Une base de données qui stocke les informations de manière flexible, sans structure rigide — idéal pour les startups.',
+    desc2: 'Base NoSQL orientée documents. BSON, aggregation pipeline, indexation, replica sets, sharding.',
+    desc3: 'Change streams, transactions multi-documents, Atlas Search, time series collections, schema validation avancée.',
+    specific: { difficulty: 'Intermédiaire', learn_time: '2-4 semaines', market_share: '#1 NoSQL', use_cases: ['Apps temps réel', 'IoT', 'CMS'] },
+    taught_in: [{ level: 'B3', semester: 'S5', module: 'Bases de données avancées', depth: 'Avancé' }],
+    resources: [{ title: 'MongoDB University', url: 'https://university.mongodb.com' }]
+  },
+  { id: 'redis', name: 'Redis', galaxy: 'tech', icon: '🔴',
+    desc1: 'Une base de données ultra-rapide qui garde les infos en mémoire vive. Utilisé pour accélérer les applications.',
+    desc2: 'Base in-memory. Cache, sessions, pub/sub, queues. Structures: strings, hashes, sets, sorted sets, streams.',
+    desc3: 'Redis Cluster, Sentinel, Lua scripting, modules custom, memory optimization, persistence strategies (RDB/AOF).',
+    specific: { difficulty: 'Intermédiaire', learn_time: '1-2 semaines', market_share: '#1 cache/in-memory', use_cases: ['Cache', 'Sessions', 'Real-time', 'Queues'] },
+    taught_in: [{ level: 'M1', semester: 'S7', module: 'Performance & Infra', depth: 'Avancé' }],
+    resources: [{ title: 'Redis Docs', url: 'https://redis.io' }]
+  },
+  { id: 'd3', name: 'D3.js', galaxy: 'tech', icon: '📊',
+    desc1: 'Une librairie JavaScript pour créer des visualisations de données interactives et spectaculaires dans un navigateur.',
+    desc2: 'Bibliothèque de data visualization. SVG, Canvas, force-directed graphs, transitions, scales, axes.',
+    desc3: 'Custom force simulations, Voronoï overlays, canvas rendering perf, geographic projections, brushing & linking.',
+    specific: { difficulty: 'Avancé', learn_time: '2-4 mois', market_share: '#1 dataviz web', use_cases: ['Dashboards', 'Data stories', 'Graphes interactifs'] },
+    taught_in: [{ level: 'B3', semester: 'S6', module: 'Visualisation de données', depth: 'Avancé' }],
+    resources: [{ title: 'D3 Gallery', url: 'https://observablehq.com/@d3/gallery' }]
+  },
+
+  // ── Métiers ──
+  { id: 'dev-fullstack', name: 'Dev Full-Stack', galaxy: 'metier', icon: '👨‍💻',
+    desc1: 'Le couteau suisse du développement web. Il sait créer à la fois la partie visible (front) et invisible (back) d\'un site.',
+    desc2: 'Développeur maîtrisant front-end et back-end. Capable de concevoir, développer et déployer une application complète.',
+    desc3: 'Architecture logicielle, choix de stack, CI/CD, performance, sécurité, mentoring junior devs, tech leadership.',
+    specific: { average_salary: { junior: '32-38K', confirme: '42-52K', senior: '55-70K' }, job_market: 'Très forte demande', required_level: 'B3 / M1', sectors: ['Startup', 'ESN', 'E-commerce', 'Éditeur'] },
+    resources: []
+  },
+  { id: 'data-engineer', name: 'Data Engineer', galaxy: 'metier', icon: '🔬',
+    desc1: 'L\'architecte des données. Il construit les tuyaux qui collectent, stockent et organisent les données d\'une entreprise.',
+    desc2: 'Conception de pipelines de données, ETL, data warehouses, data lakes. SQL avancé, Spark, Airflow.',
+    desc3: 'Architecture data mesh, streaming (Kafka), optimisation de requêtes à l\'échelle, data governance, DataOps.',
+    specific: { average_salary: { junior: '35-42K', confirme: '48-58K', senior: '60-80K' }, job_market: 'Forte demande croissante', required_level: 'M1 / M2', sectors: ['Finance', 'E-commerce', 'Santé', 'Industrie'] },
+    resources: []
+  },
+  { id: 'devops', name: 'Ingénieur DevOps', galaxy: 'metier', icon: '⚙️',
+    desc1: 'Le pont entre développeurs et infrastructure. Il automatise le déploiement des applications et garantit qu\'elles tournent 24/7.',
+    desc2: 'CI/CD, infrastructure as code, monitoring, containerisation, cloud providers, SRE practices.',
+    desc3: 'Platform engineering, GitOps, chaos engineering, FinOps, observability stack, incident management.',
+    specific: { average_salary: { junior: '38-44K', confirme: '50-60K', senior: '65-85K' }, job_market: 'Très forte demande', required_level: 'M1 / M2', sectors: ['Cloud', 'Finance', 'Scale-up', 'SaaS'] },
+    resources: []
+  },
+  { id: 'chef-projet', name: 'Chef de Projet IT', galaxy: 'metier', icon: '📋',
+    desc1: 'Le chef d\'orchestre qui coordonne les équipes techniques, gère les délais et le budget pour livrer un projet informatique.',
+    desc2: 'Pilotage de projets IT. Agile/Scrum, planning, gestion des risques, stakeholders, budget, reporting.',
+    desc3: 'Management multi-équipes, transformation digitale, gouvernance IT, portfolio management, coaching agile.',
+    specific: { average_salary: { junior: '35-40K', confirme: '45-55K', senior: '55-75K' }, job_market: 'Demande stable', required_level: 'M1 / M2', sectors: ['ESN', 'Grand compte', 'Banque', 'Industrie'] },
+    resources: []
+  },
+  { id: 'cloud-architect', name: 'Cloud Architect', galaxy: 'metier', icon: '☁️',
+    desc1: 'Il conçoit l\'infrastructure technique dans le cloud — comment les serveurs, bases de données et services communiquent.',
+    desc2: 'Architecture cloud (AWS, Azure, GCP). Design patterns, sécurité, coûts, migration, haute disponibilité.',
+    desc3: 'Multi-cloud strategy, landing zones, compliance frameworks, FinOps, Well-Architected reviews.',
+    specific: { average_salary: { junior: '42-48K', confirme: '55-70K', senior: '75-100K' }, job_market: 'Très forte demande', required_level: 'M2 / Senior', sectors: ['Cloud', 'Finance', 'Éditeur SaaS'] },
+    resources: []
+  },
+  { id: 'cybersec', name: 'Analyste Cybersécurité', galaxy: 'metier', icon: '🛡️',
+    desc1: 'Le gardien de la sécurité informatique. Il protège les systèmes contre les attaques et les fuites de données.',
+    desc2: 'Audit de sécurité, pentesting, SIEM, gestion des vulnérabilités, conformité (ISO 27001, RGPD).',
+    desc3: 'Red team / blue team, threat intelligence, forensics, reverse engineering, architecture zero trust.',
+    specific: { average_salary: { junior: '36-42K', confirme: '48-60K', senior: '65-90K' }, job_market: 'Demande explosive', required_level: 'M1 / M2', sectors: ['Banque', 'Défense', 'Santé', 'Cloud'] },
+    resources: []
+  },
+
+  // ── Soft Skills ──
+  { id: 'communication', name: 'Communication', galaxy: 'soft', icon: '💬',
+    desc1: 'Savoir exprimer ses idées clairement et écouter les autres — essentiel dans tous les métiers.',
+    desc2: 'Communication écrite et orale, feedback constructif, vulgarisation technique, présentation client.',
+    desc3: 'Communication de crise, prise de parole en public, storytelling, communication non-violente, influence.',
+    specific: { context: ['Réunions', 'Présentations', 'Emails', 'Code reviews'], how_to_develop: 'Pratique régulière, présentations en cours, code reviews', market_demand: 'Essentielle' },
+    resources: []
+  },
+  { id: 'teamwork', name: 'Travail en Équipe', galaxy: 'soft', icon: '🤝',
+    desc1: 'Collaborer efficacement avec d\'autres personnes — partager, s\'entraider, avancer ensemble vers un objectif.',
+    desc2: 'Collaboration en mode projet, pair programming, code reviews, méthodes agiles, gestion des conflits.',
+    desc3: 'Leadership d\'équipe, facilitation, intelligence collective, remote collaboration, cross-functional teams.',
+    specific: { context: ['Projets de groupe', 'Sprint agile', 'Pair programming'], how_to_develop: 'Projets en équipe dès le B1, hackathons', market_demand: 'Essentielle' },
+    resources: []
+  },
+  { id: 'problem-solving', name: 'Résolution de Problèmes', galaxy: 'soft', icon: '🧩',
+    desc1: 'La capacité à analyser un problème, explorer des solutions et choisir la meilleure — le cœur de l\'informatique.',
+    desc2: 'Pensée analytique, décomposition de problèmes, debugging, design thinking, approche scientifique.',
+    desc3: 'Systems thinking, root cause analysis, decision frameworks, innovation méthodique.',
+    specific: { context: ['Debugging', 'Architecture', 'Optimisation', 'Incidents'], how_to_develop: 'Algorithmes, projets complexes, compétitions', market_demand: 'Très recherchée' },
+    resources: []
+  },
+  { id: 'gestion-projet', name: 'Gestion de Projet', galaxy: 'soft', icon: '📅',
+    desc1: 'Organiser le travail, respecter les délais, prioriser les tâches — même quand on n\'est pas chef de projet.',
+    desc2: 'Agile/Scrum, Kanban, estimation, priorisation, gestion du temps, outils (Jira, Notion, Trello).',
+    desc3: 'Scaling agile (SAFe), OKRs, portfolio management, risk management, stakeholder management.',
+    specific: { context: ['Projets de cours', 'Alternance', 'Freelance'], how_to_develop: 'Être Scrum Master en projet de groupe', market_demand: 'Très recherchée' },
+    resources: []
+  },
+  { id: 'leadership', name: 'Leadership', galaxy: 'soft', icon: '🌟',
+    desc1: 'Inspirer et guider les autres, prendre des initiatives — pas besoin d\'être manager pour être leader.',
+    desc2: 'Influence positive, prise de décision, mentoring, vision, responsabilité, exemplarité.',
+    desc3: 'Leadership situationnel, coaching, transformation management, vision stratégique.',
+    specific: { context: ['Tech lead', 'Mentorat', 'Initiatives'], how_to_develop: 'Mentorat de juniors, leadership en projets', market_demand: 'Recherchée (senior)' },
+    resources: []
+  },
+  { id: 'esprit-critique', name: 'Esprit Critique', galaxy: 'soft', icon: '🔍',
+    desc1: 'Questionner, vérifier, ne pas accepter une solution juste parce que "ça marche". Aller au fond des choses.',
+    desc2: 'Évaluation des sources, pensée critique sur les choix techniques, remise en question constructive.',
+    desc3: 'Analyse de biais (y compris IA), évaluation de trade-offs architecturaux, veille technologique critique.',
+    specific: { context: ['Code reviews', 'Choix de stack', 'Veille techno'], how_to_develop: 'Code reviews, débats techniques, veille', market_demand: 'Essentielle' },
+    resources: []
+  },
+];
+
+const links = [
+  // Intra-tech
+  { source: 'html', target: 'css', strength: 1.0 },
+  { source: 'css', target: 'js', strength: 0.8 },
+  { source: 'js', target: 'react', strength: 0.95 },
+  { source: 'js', target: 'node', strength: 0.9 },
+  { source: 'js', target: 'typescript', strength: 0.9 },
+  { source: 'js', target: 'd3', strength: 0.7 },
+  { source: 'python', target: 'django', strength: 0.95 },
+  { source: 'django', target: 'postgresql', strength: 0.85 },
+  { source: 'node', target: 'mongodb', strength: 0.7 },
+  { source: 'docker', target: 'kubernetes', strength: 0.9 },
+  { source: 'postgresql', target: 'redis', strength: 0.5 },
+  { source: 'react', target: 'typescript', strength: 0.8 },
+  { source: 'react', target: 'd3', strength: 0.6 },
+  { source: 'node', target: 'postgresql', strength: 0.6 },
+  { source: 'git', target: 'docker', strength: 0.4 },
+
+  // Inter: Métier → Tech
+  { source: 'dev-fullstack', target: 'react', strength: 0.9 },
+  { source: 'dev-fullstack', target: 'node', strength: 0.85 },
+  { source: 'dev-fullstack', target: 'postgresql', strength: 0.8 },
+  { source: 'dev-fullstack', target: 'git', strength: 0.9 },
+  { source: 'dev-fullstack', target: 'docker', strength: 0.6 },
+  { source: 'data-engineer', target: 'python', strength: 0.95 },
+  { source: 'data-engineer', target: 'postgresql', strength: 0.9 },
+  { source: 'data-engineer', target: 'redis', strength: 0.5 },
+  { source: 'devops', target: 'docker', strength: 0.95 },
+  { source: 'devops', target: 'kubernetes', strength: 0.9 },
+  { source: 'devops', target: 'git', strength: 0.8 },
+  { source: 'devops', target: 'python', strength: 0.6 },
+  { source: 'cloud-architect', target: 'kubernetes', strength: 0.9 },
+  { source: 'cloud-architect', target: 'docker', strength: 0.85 },
+  { source: 'cybersec', target: 'python', strength: 0.7 },
+  { source: 'chef-projet', target: 'git', strength: 0.4 },
+
+  // Inter: Métier → Soft
+  { source: 'dev-fullstack', target: 'teamwork', strength: 0.8 },
+  { source: 'dev-fullstack', target: 'problem-solving', strength: 0.9 },
+  { source: 'devops', target: 'problem-solving', strength: 0.85 },
+  { source: 'chef-projet', target: 'communication', strength: 0.95 },
+  { source: 'chef-projet', target: 'gestion-projet', strength: 0.95 },
+  { source: 'chef-projet', target: 'leadership', strength: 0.85 },
+  { source: 'cloud-architect', target: 'esprit-critique', strength: 0.8 },
+  { source: 'data-engineer', target: 'esprit-critique', strength: 0.75 },
+  { source: 'cybersec', target: 'esprit-critique', strength: 0.9 },
+
+  // Intra-soft
+  { source: 'communication', target: 'teamwork', strength: 0.8 },
+  { source: 'communication', target: 'leadership', strength: 0.7 },
+  { source: 'teamwork', target: 'gestion-projet', strength: 0.6 },
+  { source: 'leadership', target: 'gestion-projet', strength: 0.7 },
+  { source: 'esprit-critique', target: 'problem-solving', strength: 0.85 },
+];
+
+// ══════════════════════════════════════════════
+//  GRAPH RENDERING
+// ══════════════════════════════════════════════
+
+const width = window.innerWidth;
+const height = window.innerHeight;
+const galaxyMap = {};
+galaxies.forEach(g => galaxyMap[g.id] = g);
+
+// Galaxy centers for initial clustering
+const galaxyCenters = {
+  tech: { x: width * 0.35, y: height * 0.5 },
+  metier: { x: width * 0.72, y: height * 0.35 },
+  soft: { x: width * 0.7, y: height * 0.7 },
+};
+
+// Prepare D3 data
+const d3Nodes = nodes.map(n => ({
+  ...n,
+  x: galaxyCenters[n.galaxy].x + (Math.random() - 0.5) * 200,
+  y: galaxyCenters[n.galaxy].y + (Math.random() - 0.5) * 200,
+  r: n.galaxy === 'metier' ? 22 : n.galaxy === 'tech' ? 16 : 14,
+}));
+
+const d3Links = links.map(l => ({
+  source: l.source,
+  target: l.target,
+  strength: l.strength,
+}));
+
+// Update stats
+document.getElementById('statNodes').textContent = d3Nodes.length;
+document.getElementById('statLinks').textContent = d3Links.length;
+
+// Build legend
+const legend = document.getElementById('galaxyLegend');
+galaxies.forEach(g => {
+  const count = nodes.filter(n => n.galaxy === g.id).length;
+  const el = document.createElement('div');
+  el.className = 'legend-item';
+  el.dataset.galaxy = g.id;
+  el.innerHTML = `<div class="legend-dot" style="background:${g.color};box-shadow:0 0 6px ${g.color}40"></div>${g.icon} ${g.name}<span class="legend-count">${count}</span>`;
+  el.onclick = () => toggleGalaxy(g.id);
+  legend.appendChild(el);
+});
+
+// SVG setup
+const svg = d3.select('#graph-canvas')
+  .attr('width', width)
+  .attr('height', height);
+
+// Stars background
+const starGroup = svg.append('g').attr('class', 'stars');
+for (let i = 0; i < 200; i++) {
+  starGroup.append('circle')
+    .attr('class', 'star')
+    .attr('cx', Math.random() * width)
+    .attr('cy', Math.random() * height)
+    .attr('r', Math.random() * 1.2 + 0.3)
+    .style('animation-duration', (Math.random() * 4 + 2) + 's')
+    .style('animation-delay', (Math.random() * 4) + 's');
+}
+
+// Container for zoom
+const container = svg.append('g');
+
+// Zoom behavior
+const zoom = d3.zoom()
+  .scaleExtent([0.3, 4])
+  .on('zoom', (event) => {
+    container.attr('transform', event.transform);
+  });
+svg.call(zoom);
+
+// Links
+const linkGroup = container.append('g').attr('class', 'links');
+const linkElements = linkGroup.selectAll('line')
+  .data(d3Links)
+  .join('line')
+  .attr('stroke', d => {
+    const s = d3Nodes.find(n => n.id === (d.source.id || d.source));
+    const t = d3Nodes.find(n => n.id === (d.target.id || d.target));
+    if (s && t && s.galaxy !== t.galaxy) return '#444870';
+    if (s) return galaxyMap[s.galaxy]?.color + '40';
+    return '#333';
+  })
+  .attr('stroke-width', d => d.strength * 2 + 0.5)
+  .attr('stroke-dasharray', d => {
+    const s = d3Nodes.find(n => n.id === (d.source.id || d.source));
+    const t = d3Nodes.find(n => n.id === (d.target.id || d.target));
+    return (s && t && s.galaxy !== t.galaxy) ? '4,4' : 'none';
+  });
+
+// Node groups
+const nodeGroup = container.append('g').attr('class', 'nodes');
+const nodeElements = nodeGroup.selectAll('g')
+  .data(d3Nodes)
+  .join('g')
+  .attr('class', 'node-group')
+  .style('cursor', 'pointer')
+  .call(d3.drag()
+    .on('start', dragStarted)
+    .on('drag', dragged)
+    .on('end', dragEnded)
+  )
+  .on('click', (event, d) => {
+    event.stopPropagation();
+    openPanel(d);
+  })
+  .on('mouseenter', (event, d) => highlightConnections(d))
+  .on('mouseleave', () => resetHighlight());
+
+// Node glow
+nodeElements.append('circle')
+  .attr('class', 'node-glow')
+  .attr('r', d => d.r + 8)
+  .attr('fill', d => galaxyMap[d.galaxy].color)
+  .attr('opacity', 0)
+  .attr('filter', 'url(#glow)');
+
+// Node circle
+nodeElements.append('circle')
+  .attr('class', 'node-circle')
+  .attr('r', d => d.r)
+  .attr('fill', d => galaxyMap[d.galaxy].color + '18')
+  .attr('stroke', d => galaxyMap[d.galaxy].color)
+  .attr('stroke-width', 1.5);
+
+// Node icon
+nodeElements.append('text')
+  .attr('class', 'node-icon')
+  .attr('text-anchor', 'middle')
+  .attr('dominant-baseline', 'central')
+  .attr('font-size', d => d.r * 0.85)
+  .text(d => d.icon);
+
+// Node label
+nodeElements.append('text')
+  .attr('class', 'node-label')
+  .attr('text-anchor', 'middle')
+  .attr('dy', d => d.r + 14)
+  .attr('fill', '#c0c8e0')
+  .attr('font-size', 11)
+  .attr('font-weight', 500)
+  .text(d => d.name);
+
+// SVG filter for glow
+const defs = svg.append('defs');
+const filter = defs.append('filter').attr('id', 'glow');
+filter.append('feGaussianBlur').attr('stdDeviation', '4').attr('result', 'blur');
+filter.append('feMerge').selectAll('feMergeNode')
+  .data(['blur', 'SourceGraphic'])
+  .join('feMergeNode')
+  .attr('in', d => d);
+
+// Force simulation
+const simulation = d3.forceSimulation(d3Nodes)
+  .force('link', d3.forceLink(d3Links).id(d => d.id).distance(d => 100 / d.strength).strength(d => d.strength * 0.3))
+  .force('charge', d3.forceManyBody().strength(-250))
+  .force('x', d3.forceX(d => galaxyCenters[d.galaxy].x).strength(0.06))
+  .force('y', d3.forceY(d => galaxyCenters[d.galaxy].y).strength(0.06))
+  .force('collision', d3.forceCollide(d => d.r + 12))
+  .on('tick', ticked);
+
+function ticked() {
+  linkElements
+    .attr('x1', d => d.source.x)
+    .attr('y1', d => d.source.y)
+    .attr('x2', d => d.target.x)
+    .attr('y2', d => d.target.y);
+
+  nodeElements.attr('transform', d => `translate(${d.x},${d.y})`);
+}
+
+// Drag
+function dragStarted(event, d) {
+  if (!event.active) simulation.alphaTarget(0.3).restart();
+  d.fx = d.x; d.fy = d.y;
+}
+function dragged(event, d) { d.fx = event.x; d.fy = event.y; }
+function dragEnded(event, d) {
+  if (!event.active) simulation.alphaTarget(0);
+  d.fx = null; d.fy = null;
+}
+
+// Hover highlight
+function highlightConnections(d) {
+  const connected = new Set();
+  connected.add(d.id);
+  d3Links.forEach(l => {
+    const sid = l.source.id || l.source;
+    const tid = l.target.id || l.target;
+    if (sid === d.id) connected.add(tid);
+    if (tid === d.id) connected.add(sid);
+  });
+
+  nodeElements.transition().duration(200)
+    .style('opacity', n => connected.has(n.id) ? 1 : 0.12);
+  nodeElements.selectAll('.node-glow')
+    .transition().duration(200)
+    .attr('opacity', n => n.id === d.id ? 0.3 : 0);
+  linkElements.transition().duration(200)
+    .style('opacity', l => {
+      const sid = l.source.id || l.source;
+      const tid = l.target.id || l.target;
+      return (sid === d.id || tid === d.id) ? 1 : 0.05;
+    })
+    .attr('stroke-width', l => {
+      const sid = l.source.id || l.source;
+      const tid = l.target.id || l.target;
+      return (sid === d.id || tid === d.id) ? l.strength * 3 + 1 : l.strength * 2 + 0.5;
+    });
+}
+
+function resetHighlight() {
+  nodeElements.transition().duration(300).style('opacity', 1);
+  nodeElements.selectAll('.node-glow').transition().duration(300).attr('opacity', 0);
+  linkElements.transition().duration(300)
+    .style('opacity', 1)
+    .attr('stroke-width', d => d.strength * 2 + 0.5);
+}
+
+// ══════════════════════════════════════════════
+//  SIDE PANEL
+// ══════════════════════════════════════════════
+
+let panelOpen = false;
+
+function openPanel(d) {
+  const panel = document.getElementById('sidePanel');
+  const tag = document.getElementById('panelTag');
+  const title = document.getElementById('panelTitle');
+  const body = document.getElementById('panelBody');
+
+  const g = galaxyMap[d.galaxy];
+  tag.className = `panel-galaxy-tag ${d.galaxy === 'tech' ? 'tech' : d.galaxy === 'metier' ? 'metier' : 'soft'}`;
+  tag.textContent = `${g.icon} ${g.name}`;
+  title.textContent = `${d.icon} ${d.name}`;
+
+  let html = '';
+
+  // Description levels
+  html += `
+    <div class="level-tabs">
+      <button class="level-tab active" onclick="switchLevel(this, 1)">Niveau 1</button>
+      <button class="level-tab" onclick="switchLevel(this, 2)">Niveau 2</button>
+      <button class="level-tab" onclick="switchLevel(this, 3)">Niveau 3</button>
+    </div>
+    <div class="description-text" id="descText">${d.desc1}</div>
+  `;
+
+  // Specific data
+  if (d.galaxy === 'tech' && d.specific) {
+    html += `<div class="section-title">Données techniques</div>
+      <div class="data-grid">
+        <div class="data-card"><div class="data-label">Difficulté</div><div class="data-value">${d.specific.difficulty}</div></div>
+        <div class="data-card"><div class="data-label">Apprentissage</div><div class="data-value">${d.specific.learn_time}</div></div>
+        <div class="data-card"><div class="data-label">Marché</div><div class="data-value">${d.specific.market_share}</div></div>
+        <div class="data-card"><div class="data-label">Cas d'usage</div><div class="data-value">${d.specific.use_cases.join(', ')}</div></div>
+      </div>`;
+
+    if (d.taught_in && d.taught_in.length) {
+      html += `<div class="section-title">Enseigné dans le programme</div>`;
+      d.taught_in.forEach(t => {
+        const depthClass = t.depth === 'Expert' ? 'depth-expert' : t.depth === 'Avancé' ? 'depth-avance' : 'depth-decouverte';
+        html += `<div class="taught-in-item">
+          <span><span class="taught-level">${t.level}</span> — ${t.semester} — ${t.module}</span>
+          <span class="taught-depth ${depthClass}">${t.depth}</span>
+        </div>`;
+      });
+    }
+  }
+
+  if (d.galaxy === 'metier' && d.specific) {
+    const sal = d.specific.average_salary;
+    html += `<div class="section-title">Salaires (€ brut/an)</div>
+      <div class="salary-grid">
+        <div class="salary-card"><div class="salary-label">Junior</div><div class="salary-value">${sal.junior}</div></div>
+        <div class="salary-card"><div class="salary-label">Confirmé</div><div class="salary-value">${sal.confirme}</div></div>
+        <div class="salary-card"><div class="salary-label">Senior</div><div class="salary-value">${sal.senior}</div></div>
+      </div>
+      <div class="data-grid">
+        <div class="data-card"><div class="data-label">Marché</div><div class="data-value">${d.specific.job_market}</div></div>
+        <div class="data-card"><div class="data-label">Niveau requis</div><div class="data-value">${d.specific.required_level}</div></div>
+      </div>`;
+    if (d.specific.sectors) {
+      html += `<div class="section-title">Secteurs</div><div class="data-grid">`;
+      d.specific.sectors.forEach(s => {
+        html += `<div class="data-card"><div class="data-value" style="font-size:12px">${s}</div></div>`;
+      });
+      html += `</div>`;
+    }
+  }
+
+  if (d.galaxy === 'soft' && d.specific) {
+    html += `<div class="data-grid" style="margin-bottom:16px">
+      <div class="data-card"><div class="data-label">Demande marché</div><div class="data-value">${d.specific.market_demand}</div></div>
+      <div class="data-card"><div class="data-label">Comment la développer</div><div class="data-value" style="font-size:11px">${d.specific.how_to_develop}</div></div>
+    </div>`;
+    if (d.specific.context) {
+      html += `<div class="section-title">Contextes</div><div class="data-grid">`;
+      d.specific.context.forEach(c => {
+        html += `<div class="data-card"><div class="data-value" style="font-size:12px">${c}</div></div>`;
+      });
+      html += `</div>`;
+    }
+  }
+
+  // Connections
+  const connections = [];
+  links.forEach(l => {
+    if (l.source === d.id || (l.source.id && l.source.id === d.id)) {
+      const tid = l.target.id || l.target;
+      const tNode = nodes.find(n => n.id === tid);
+      if (tNode) connections.push({ node: tNode, strength: l.strength });
+    }
+    if (l.target === d.id || (l.target.id && l.target.id === d.id)) {
+      const sid = l.source.id || l.source;
+      const sNode = nodes.find(n => n.id === sid);
+      if (sNode) connections.push({ node: sNode, strength: l.strength });
+    }
+  });
+
+  if (connections.length) {
+    html += `<div class="section-title" style="margin-top:20px">Connexions (${connections.length})</div>`;
+    connections.sort((a, b) => b.strength - a.strength).forEach(c => {
+      const color = galaxyMap[c.node.galaxy].color;
+      html += `<div class="connection-item" onclick="navigateToNode('${c.node.id}')">
+        <div class="connection-dot" style="background:${color}"></div>
+        <span class="connection-name">${c.node.icon} ${c.node.name}</span>
+        <span class="connection-strength">${(c.strength * 100).toFixed(0)}%</span>
+      </div>`;
+    });
+  }
+
+  // Resources
+  if (d.resources && d.resources.length) {
+    html += `<div class="section-title" style="margin-top:20px">Ressources</div>`;
+    d.resources.forEach(r => {
+      html += `<a href="${r.url}" target="_blank" class="resource-link">📎 ${r.title}</a>`;
+    });
+  }
+
+  body.innerHTML = html;
+
+  // Store current descriptions for tab switching
+  body.dataset.desc1 = d.desc1;
+  body.dataset.desc2 = d.desc2;
+  body.dataset.desc3 = d.desc3;
+
+  panel.classList.add('open');
+  panelOpen = true;
+}
+
+function closePanel() {
+  document.getElementById('sidePanel').classList.remove('open');
+  panelOpen = false;
+}
+
+function switchLevel(btn, level) {
+  document.querySelectorAll('.level-tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  const body = document.getElementById('panelBody');
+  const desc = body.dataset[`desc${level}`];
+  document.getElementById('descText').textContent = desc;
+}
+
+function navigateToNode(id) {
+  const node = d3Nodes.find(n => n.id === id);
+  if (node) {
+    openPanel(node);
+    // Zoom to node
+    svg.transition().duration(600).call(
+      zoom.transform,
+      d3.zoomIdentity.translate(width / 2 - node.x, height / 2 - node.y).scale(1.2)
+    );
+  }
+}
+
+// ══════════════════════════════════════════════
+//  SEARCH
+// ══════════════════════════════════════════════
+
+const searchInput = document.getElementById('searchInput');
+const searchResults = document.getElementById('searchResults');
+
+searchInput.addEventListener('input', (e) => {
+  const q = e.target.value.toLowerCase().trim();
+  if (q.length < 2) { searchResults.classList.remove('active'); return; }
+
+  const matches = nodes.filter(n =>
+    n.name.toLowerCase().includes(q) ||
+    n.desc1.toLowerCase().includes(q)
+  ).slice(0, 8);
+
+  if (matches.length === 0) { searchResults.classList.remove('active'); return; }
+
+  searchResults.innerHTML = matches.map(n => {
+    const g = galaxyMap[n.galaxy];
+    return `<div class="search-result-item" onclick="selectSearchResult('${n.id}')">
+      <div class="search-result-dot" style="background:${g.color}"></div>
+      <span class="search-result-name">${n.icon} ${n.name}</span>
+      <span class="search-result-galaxy">${g.name}</span>
+    </div>`;
+  }).join('');
+  searchResults.classList.add('active');
+});
+
+searchInput.addEventListener('blur', () => {
+  setTimeout(() => searchResults.classList.remove('active'), 200);
+});
+
+function selectSearchResult(id) {
+  searchInput.value = '';
+  searchResults.classList.remove('active');
+  navigateToNode(id);
+}
+
+// ══════════════════════════════════════════════
+//  PERSONA SWITCH
+// ══════════════════════════════════════════════
+
+const personaConfig = {
+  commercial: { primary: 'metier', label: 'Vue Commercial — Entrée Métiers' },
+  etudiant: { primary: 'tech', label: 'Vue Étudiant — Entrée Technologies' },
+  prospect: { primary: 'metier', label: 'Vue Prospect — Entrée Métiers' },
+};
+
+function switchPersona(persona) {
+  document.querySelectorAll('.persona-btn').forEach(b => b.classList.remove('active'));
+  document.querySelector(`[data-persona="${persona}"]`).classList.add('active');
+
+  const config = personaConfig[persona];
+
+  // Reposition galaxy centers based on persona
+  const primaryGalaxy = config.primary;
+  const newCenters = { ...galaxyCenters };
+
+  if (primaryGalaxy === 'metier') {
+    newCenters.metier = { x: width * 0.42, y: height * 0.48 };
+    newCenters.tech = { x: width * 0.2, y: height * 0.5 };
+    newCenters.soft = { x: width * 0.68, y: height * 0.5 };
+  } else {
+    newCenters.tech = { x: width * 0.38, y: height * 0.48 };
+    newCenters.metier = { x: width * 0.72, y: height * 0.35 };
+    newCenters.soft = { x: width * 0.7, y: height * 0.68 };
+  }
+
+  // Update forces and bump sizes
+  simulation.force('x', d3.forceX(d => newCenters[d.galaxy].x).strength(0.08));
+  simulation.force('y', d3.forceY(d => newCenters[d.galaxy].y).strength(0.08));
+
+  // Resize nodes based on persona focus
+  d3Nodes.forEach(n => {
+    if (n.galaxy === primaryGalaxy) n.r = n.galaxy === 'metier' ? 26 : 20;
+    else n.r = n.galaxy === 'metier' ? 18 : n.galaxy === 'tech' ? 14 : 12;
+  });
+
+  nodeElements.selectAll('.node-circle')
+    .transition().duration(600)
+    .attr('r', d => d.r);
+  nodeElements.selectAll('.node-glow')
+    .transition().duration(600)
+    .attr('r', d => d.r + 8);
+  nodeElements.selectAll('.node-icon')
+    .transition().duration(600)
+    .attr('font-size', d => d.r * 0.85);
+  nodeElements.selectAll('.node-label')
+    .transition().duration(600)
+    .attr('dy', d => d.r + 14);
+
+  simulation.alpha(0.5).restart();
+}
+
+// ══════════════════════════════════════════════
+//  GALAXY FILTER
+// ══════════════════════════════════════════════
+
+const hiddenGalaxies = new Set();
+
+function toggleGalaxy(galaxyId) {
+  const item = document.querySelector(`.legend-item[data-galaxy="${galaxyId}"]`);
+
+  if (hiddenGalaxies.has(galaxyId)) {
+    hiddenGalaxies.delete(galaxyId);
+    item.classList.remove('dimmed');
+  } else {
+    hiddenGalaxies.add(galaxyId);
+    item.classList.add('dimmed');
+  }
+
+  nodeElements.transition().duration(300)
+    .style('opacity', d => hiddenGalaxies.has(d.galaxy) ? 0.06 : 1)
+    .style('pointer-events', d => hiddenGalaxies.has(d.galaxy) ? 'none' : 'all');
+
+  linkElements.transition().duration(300)
+    .style('opacity', l => {
+      const sg = (typeof l.source === 'object' ? l.source : d3Nodes.find(n => n.id === l.source))?.galaxy;
+      const tg = (typeof l.target === 'object' ? l.target : d3Nodes.find(n => n.id === l.target))?.galaxy;
+      return (hiddenGalaxies.has(sg) || hiddenGalaxies.has(tg)) ? 0.03 : 1;
+    });
+}
+
+// ══════════════════════════════════════════════
+//  KEYBOARD SHORTCUTS
+// ══════════════════════════════════════════════
+
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') closePanel();
+  if (e.key === '/' && !e.ctrlKey) {
+    e.preventDefault();
+    searchInput.focus();
+  }
+});
+
+// Click on canvas closes panel
+svg.on('click', () => { if (panelOpen) closePanel(); });
+
+// Initial persona
+switchPersona('etudiant');
+</script>
+</body>
+</html>
