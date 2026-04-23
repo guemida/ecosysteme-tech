@@ -1,171 +1,71 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <!-- Basic Meta Tags -->
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Galaxia Métiers IT — 27 métiers Bac+5 RNCP Niveau 7</title>
+  <meta name="description" content="Présentation interactive des 27 métiers accessibles avec un Bac+5 RNCP Niveau 7 en informatique. 2 spécialisations, reconnaissance européenne." />
+  <meta name="theme-color" content="#0F172A" />
 
-    <!-- Primary Meta Tags -->
-    <title>🎓 Écosystème Technologique IT - Visualisation Interactive</title>
-    <meta name="title" content="Écosystème Technologique IT - Visualisation Interactive">
-    <meta name="description" content="Explorez l'écosystème des technologies IT à travers une visualisation interactive. Plus de 100 technologies mappées avec leurs connexions et relations.">
-    <meta name="keywords" content="technologies IT, développement web, frontend, backend, base de données, DevOps, sécurité, data science">
-    <meta name="author" content="Écosystème Tech">
-    <meta name="robots" content="index, follow">
-    <meta name="language" content="French">
-    <meta name="revisit-after" content="7 days">
-
-    <!-- Theme Color -->
-    <meta name="theme-color" content="#3B82F6">
-
-    <!-- Open Graph / Facebook -->
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://ecosysteme-tech.app/">
-    <meta property="og:title" content="Écosystème Technologique IT - Visualisation Interactive">
-    <meta property="og:description" content="Explorez l'écosystème des technologies IT à travers une visualisation interactive. Plus de 100 technologies mappées avec leurs connexions et relations.">
-    <meta property="og:image" content="https://ecosysteme-tech.app/preview.png">
-
-    <!-- Twitter -->
-    <meta property="twitter:card" content="summary_large_image">
-    <meta property="twitter:url" content="https://ecosysteme-tech.app/">
-    <meta property="twitter:title" content="Écosystème Technologique IT - Visualisation Interactive">
-    <meta property="twitter:description" content="Explorez l'écosystème des technologies IT à travers une visualisation interactive.">
-    <meta property="twitter:image" content="https://ecosysteme-tech.app/preview.png">
-
-    <!-- Security Headers -->
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdnjs.cloudflare.com 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; frame-ancestors 'none';">
-    <meta http-equiv="X-Content-Type-Options" content="nosniff">
-    <meta http-equiv="X-Frame-Options" content="DENY">
-    <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
-
-    <!-- Preconnect to external domains for better performance -->
-    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
-    <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
-
-    <!-- Stylesheets -->
-    <link rel="stylesheet" href="./src/css/styles.css">
-
-    <!-- D3.js Library with SRI -->
-    <script
-        src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"
-        integrity="sha512-M7nHCiNUOwFt6Us3r8alutZLm9qMt4s9951uo8jqO4UwJ1hziseL6O3ndFyigx6+LREfZqnhHxYjKRJ8ZQ69DQ=="
-        crossorigin="anonymous"
-        referrerpolicy="no-referrer"
-        defer>
-    </script>
-
-    <!-- Structured Data (JSON-LD) -->
-    <script type="application/ld+json">
-    {
-        "@context": "https://schema.org",
-        "@type": "WebApplication",
-        "name": "Écosystème Technologique IT",
-        "description": "Visualisation interactive de l'écosystème des technologies IT",
-        "url": "https://ecosysteme-tech.app/",
-        "applicationCategory": "EducationalApplication",
-        "operatingSystem": "Any",
-        "offers": {
-            "@type": "Offer",
-            "price": "0",
-            "priceCurrency": "EUR"
-        },
-        "author": {
-            "@type": "Organization",
-            "name": "Écosystème Tech"
-        }
+  <style>
+    html, body { margin: 0; padding: 0; background: #020617; color: #F8FAFC; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; }
+    #root { min-height: 100vh; }
+    #boot {
+      position: fixed; inset: 0; display: flex; align-items: center; justify-content: center;
+      background: radial-gradient(ellipse at center, rgba(59,130,246,0.15), #020617);
+      color: #F8FAFC; font-size: 22px; font-weight: 600; letter-spacing: -0.01em;
+      z-index: 1000;
     }
-    </script>
+    #boot .spin {
+      width: 56px; height: 56px; border-radius: 50%;
+      border: 4px solid rgba(248,250,252,0.12);
+      border-top-color: #8B5CF6;
+      animation: spin 900ms linear infinite;
+      margin-right: 20px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+
+  <script type="importmap">
+  {
+    "imports": {
+      "react":            "https://esm.sh/react@18.3.1",
+      "react/jsx-runtime":"https://esm.sh/react@18.3.1/jsx-runtime",
+      "react-dom":        "https://esm.sh/react-dom@18.3.1",
+      "react-dom/client": "https://esm.sh/react-dom@18.3.1/client",
+      "d3":               "https://esm.sh/d3@7.9.0",
+      "recharts":         "https://esm.sh/recharts@2.12.7?deps=react@18.3.1,react-dom@18.3.1",
+      "lucide-react":     "https://esm.sh/lucide-react@0.469.0?deps=react@18.3.1"
+    }
+  }
+  </script>
+
+  <script src="https://unpkg.com/@babel/standalone@7.26.4/babel.min.js"></script>
 </head>
 <body>
-    <!-- Skip to main content link for accessibility -->
-    <a href="#main-content" class="skip-link">Aller au contenu principal</a>
+  <div id="boot"><div class="spin"></div>Chargement de la galaxie…</div>
+  <div id="root"></div>
 
-    <!-- Header -->
-    <header class="header" role="banner">
-        <div class="header__top">
-            <div>
-                <h1>🎓 Écosystème Technologique IT</h1>
-                <p>Cliquez pour explorer les connexions • Molette pour zoomer • Glissez pour déplacer</p>
-            </div>
-            <div class="header-actions">
-                <div class="search-container">
-                    <label for="searchInput" class="visually-hidden">Rechercher une technologie</label>
-                    <input
-                        type="search"
-                        class="search-box"
-                        placeholder="🔍 Rechercher..."
-                        id="searchInput"
-                        aria-label="Rechercher une technologie"
-                        autocomplete="off"
-                        role="searchbox">
-                </div>
-                <button
-                    class="theme-toggle"
-                    id="themeToggle"
-                    aria-label="Basculer le mode sombre"
-                    title="Basculer le mode sombre">
-                    <span class="icon-sun" aria-hidden="true">☀️</span>
-                    <span class="icon-moon" aria-hidden="true">🌙</span>
-                </button>
-            </div>
-        </div>
-        <nav class="filters" id="filterButtons" role="navigation" aria-label="Filtres par catégorie"></nav>
-    </header>
+  <script type="text/babel"
+          data-type="module"
+          data-presets="react"
+          src="./app.jsx"></script>
 
-    <!-- Main Content -->
-    <main class="main-container" id="main-content" role="main">
-        <!-- Graph Container -->
-        <div class="graph-container">
-            <svg
-                id="graph"
-                role="img"
-                aria-label="Graphe interactif de l'écosystème technologique IT"
-                xmlns="http://www.w3.org/2000/svg">
-                <title>Graphe des technologies IT</title>
-                <desc>Visualisation interactive montrant les connexions entre plus de 100 technologies IT organisées par catégories</desc>
-            </svg>
-
-            <!-- Stats Overlay -->
-            <div class="stats-overlay" role="status" aria-live="polite">
-                <div class="stat-item">
-                    <div class="stat-value" id="nodeCount" aria-label="Nombre de technologies">0</div>
-                    <div class="stat-label">Technologies</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-value" id="linkCount" aria-label="Nombre de connexions">0</div>
-                    <div class="stat-label">Connexions</div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Sidebar -->
-        <aside
-            class="sidebar"
-            id="sidebar"
-            role="complementary"
-            aria-label="Détails de la technologie sélectionnée">
-            <!-- Content will be dynamically inserted by JavaScript -->
-        </aside>
-    </main>
-
-    <!-- Footer (for copyright) -->
-    <footer style="display:none;">
-        <p>&copy; 2026 Écosystème Technologique IT. Tous droits réservés.</p>
-        <p>Ce code est protégé par copyright. Toute reproduction non autorisée est interdite.</p>
-    </footer>
-
-    <!-- Embedded Data (no server required) -->
-    <script src="./src/data/data.js" defer></script>
-    <!-- Application JavaScript -->
-    <script src="./src/js/app.js" defer></script>
-
-    <!-- Noscript fallback -->
-    <noscript>
-        <div style="padding: 2rem; text-align: center; background: #fff3cd; color: #856404;">
-            <h2>JavaScript requis</h2>
-            <p>Cette application nécessite JavaScript pour fonctionner. Veuillez activer JavaScript dans votre navigateur.</p>
-        </div>
-    </noscript>
+  <script>
+    // Hide boot screen once React has mounted
+    const obs = new MutationObserver(() => {
+      const root = document.getElementById('root');
+      if (root && root.children.length > 0) {
+        const boot = document.getElementById('boot');
+        if (boot) {
+          boot.style.transition = 'opacity 400ms ease';
+          boot.style.opacity = '0';
+          setTimeout(() => boot.remove(), 450);
+        }
+        obs.disconnect();
+      }
+    });
+    obs.observe(document.getElementById('root'), { childList: true });
+  </script>
 </body>
 </html>
