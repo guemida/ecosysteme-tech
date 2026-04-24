@@ -67,14 +67,14 @@ const SOFTSKILLS = [
   { id: 'SS02', name: 'Storytelling Data',         courseId: 'M1DASC',  desc: "Vulgariser des insights data auprès de décideurs" },
   { id: 'SS03', name: 'Esprit équipe Cyber',       courseId: 'M1APPW',  desc: "Coordination Blue/Red Team, gestion de crise" },
   { id: 'SS04', name: 'Innovation & pitch',        courseId: 'M1INNO',  desc: "Défendre un projet devant un jury" },
-  { id: 'SS05', name: 'Réflexion stratégique',     courseId: '5DIG',    desc: "Vision business + tech, transformation digitale" },
-  { id: 'SS06', name: 'Éthique professionnelle',   courseId: '5ETH',    desc: "Décisions IA/cyber responsables" },
-  { id: 'SS07', name: 'Intelligence économique',   courseId: '5ECO',    desc: "Veille concurrentielle, influence" },
-  { id: 'SS08', name: 'Communication exécutive',   courseId: '5MEM',    desc: "Convaincre un comité de direction" },
-  { id: 'SS09', name: 'Conformité et droit',       courseId: '5DCR',    desc: "RGPD, contrats, responsabilité juridique" },
+  { id: 'SS05', name: 'Réflexion stratégique',     courseId: 'M2GESTP', desc: "Vision business + tech, leadership de projet" },
+  { id: 'SS06', name: 'Éthique professionnelle',   courseId: 'M2ETHI',  desc: "Décisions IA/cyber responsables" },
+  { id: 'SS07', name: 'Intelligence économique',   courseId: 'M2VEILL', desc: "Veille concurrentielle, RGPD, influence" },
+  { id: 'SS08', name: 'Communication exécutive',   courseId: 'M2GESTP', desc: "Convaincre un comité de direction" },
+  { id: 'SS09', name: 'Conformité et droit',       courseId: 'M2VEILL', desc: "RGPD, contrats, responsabilité juridique" },
   { id: 'SS10', name: 'Gestion de projet Agile',   courseId: 'M1PROJ',  desc: "Scrum, sprints, backlog, rétrospectives" },
   { id: 'SS11', name: 'Prise de parole',           courseId: 'M1SPRO',  desc: "Pitch, improvisation, présentation" },
-  { id: 'SS12', name: 'Data Storytelling avancé',  courseId: '5BIS',    desc: "Power BI, Tanagra, visualisation décisionnelle" }
+  { id: 'SS12', name: 'Data Storytelling avancé',  courseId: 'M2GOUVD', desc: "Visualisation décisionnelle, gouvernance data" }
 ];
 
 /* ============================================================
@@ -107,33 +107,29 @@ const COURSES = [
   { id: 'M1SECUA', name: 'Sécu Web Avancée & Audit',                         year: 'M1', unit: 'U3', spec: 't2', days: 5 },
   { id: 'M1SPRO',  name: 'Projet + Soft Skills',                             year: 'M1', unit: 'U3', spec: 't2', days: 5 },
 
-  // M2 Tronc commun (U1)
-  { id: '5DIG', name: 'Réflexion Stratégique & Transformation Numérique', year: 'M2', unit: 'U1', spec: 'common', days: 4 },
-  { id: '5DCR', name: 'Droit des Contrats & RGPD',                        year: 'M2', unit: 'U1', spec: 'common', days: 2 },
-  { id: '5ECO', name: 'Intelligence Économique',                          year: 'M2', unit: 'U1', spec: 'common', days: 2 },
-  { id: '5ETH', name: 'Éthiques au 21e siècle',                           year: 'M2', unit: 'U1', spec: 'common', days: 2 },
-  { id: '5SEC', name: 'Sécurité Informatique ISO 27001',                  year: 'M2', unit: 'U1', spec: 'common', days: 4 },
-  { id: '5NAC', name: 'Sécurité des Réseaux (NAC)',                       year: 'M2', unit: 'U1', spec: 'common', days: 4 },
-  { id: '5BIM', name: 'BIM, Objets Connectés & IA',                       year: 'M2', unit: 'U1', spec: 'common', days: 4 },
-  { id: '5SPR', name: 'Sport (transversal)',                              year: 'M2', unit: 'U1', spec: 'common', days: 0 },
-  { id: '5ENG', name: 'Anglais (transversal)',                            year: 'M2', unit: 'U1', spec: 'common', days: 0 },
+  // M2 U1 — Tronc commun (6 semaines, 5j)
+  { id: 'M2VEILL', name: 'Veille Technologique et RGPD',                     year: 'M2', unit: 'U1', spec: 'common', days: 5 },
+  { id: 'M2GESTP', name: "Gestion de Projet et Management d'Équipe",         year: 'M2', unit: 'U1', spec: 'common', days: 5 },
+  { id: 'M2OFFR',  name: "Appel d'offres et urbanisation SI",                year: 'M2', unit: 'U1', spec: 'common', days: 5 },
+  { id: 'M2INDU',  name: 'Industrialisation SI et Haute Disponibilité',      year: 'M2', unit: 'U1', spec: 'common', days: 5 },
+  { id: 'M2PCAG',  name: 'PCA, PRA et Green IT',                             year: 'M2', unit: 'U1', spec: 'common', days: 5 },
+  { id: 'M2WEB3',  name: 'Web3 et Blockchain — Technologies Décentralisées', year: 'M2', unit: 'U1', spec: 'common', days: 5 },
 
-  // M2 Spé IA (U2)
-  { id: '5BIS', name: 'Business Intelligence (Tanagra)',   year: 'M2', unit: 'U2', spec: 't1', days: 4 },
-  { id: '5BDA', name: 'Big Data Avancé (PyTorch)',         year: 'M2', unit: 'U2', spec: 't1', days: 6 },
-  { id: '5DLA', name: 'Deep Learning Avancé',              year: 'M2', unit: 'U2', spec: 't1', days: 6 },
-  { id: '5IAG', name: 'Intelligence Artificielle Générative', year: 'M2', unit: 'U2', spec: 't1', days: 4 },
+  // M2 U2 — IA/Data
+  { id: 'M2GOUVD', name: 'Gouvernance des données et Architecture Cloud',    year: 'M2', unit: 'U2', spec: 't1', days: 5 },
+  { id: 'M2STREA', name: 'Streaming Apache Storm & Data Engineering',        year: 'M2', unit: 'U2', spec: 't1', days: 5 },
 
-  // M2 Spé Cyber (U2)
-  { id: '5AWS', name: 'Plateforme Cloud AWS',              year: 'M2', unit: 'U2', spec: 't2', days: 4 },
-  { id: '5SOA', name: 'Sécurité Offensive & Audit',        year: 'M2', unit: 'U2', spec: 't2', days: 6 },
-  { id: '5SOP', name: 'Philosophie SecOps',                year: 'M2', unit: 'U2', spec: 't2', days: 4 },
-  { id: '5SPC', name: 'Sécurité Plateformes Cloud',        year: 'M2', unit: 'U2', spec: 't2', days: 6 },
+  // M2 U2 — CyberSécu
+  { id: 'M2PYTS',  name: 'Python Scripting Sécurité et Sécurité Cloud',      year: 'M2', unit: 'U2', spec: 't2', days: 5 },
+  { id: 'M2SECM',  name: 'Sécurité IoT et Mobile',                           year: 'M2', unit: 'U2', spec: 't2', days: 5 },
 
-  // M2 U3 commun
-  { id: '5MEM', name: 'Méthodologie Mémoire de fin d\'études', year: 'M2', unit: 'U3', spec: 'common', days: 0 },
-  { id: '5MEO', name: 'Soutenance Mémoire',                    year: 'M2', unit: 'U3', spec: 'common', days: 0 },
-  { id: '5STA', name: 'Stage 6 mois en entreprise',            year: 'M2', unit: 'U3', spec: 'common', days: 0 }
+  // M2 U3 — IA/Data
+  { id: 'M2ETHI',  name: 'Éthique et SoftSkills (Data Science Business)',    year: 'M2', unit: 'U3', spec: 't1', days: 5 },
+  { id: 'M2IAAV',  name: 'Intelligence Artificielle et ML Avancés',          year: 'M2', unit: 'U3', spec: 't1', days: 5 },
+
+  // M2 U3 — CyberSécu
+  { id: 'M2PENT',  name: 'Pentesting Avancé',                                year: 'M2', unit: 'U3', spec: 't2', days: 5 },
+  { id: 'M2GOUVI', name: 'Gouvernance et Sécurité des Infrastructures',      year: 'M2', unit: 'U3', spec: 't2', days: 5 }
 ];
 
 /* ============================================================
@@ -181,7 +177,7 @@ const JOBS = [
   code_rome: 'M1403',
   description: "Le Data Scientist conçoit des modèles statistiques et de machine learning pour extraire de la valeur des données massives. Il transforme des jeux de données complexes en insights actionnables pour la stratégie d'entreprise.",
   courseIds_m1: ['M1PYML','M1DASC','M1SPAR','M1MLOP','M1DISTR'],
-  courseIds_m2: ['5BIS','5BDA','5DLA','5IAG','5DIG'],
+  courseIds_m2: ['M2GOUVD','M2STREA','M2IAAV','M2ETHI'],
   recommended_project: "Projet de recherche ML appliqué au business (mémoire M2)",
   hard_skills: ['Python (Pandas, Scikit-learn)','Machine Learning supervisé / non-supervisé','Deep Learning (PyTorch / TensorFlow)','SQL avancé','Statistiques & probabilités','Data Visualization (Matplotlib, Seaborn)','Feature Engineering','MLOps & déploiement de modèles'],
   softskillIds: ['SS02','SS05','SS08','SS06','SS12'],
@@ -201,7 +197,7 @@ const JOBS = [
   code_rome: 'M1805',
   description: "Le Data Engineer conçoit, construit et maintient les pipelines de données et l'infrastructure qui permettent aux Data Scientists et analystes de travailler. Il garantit la qualité, la fiabilité et la scalabilité des flux de données.",
   courseIds_m1: ['M1PYML','M1SPAR','M1DISTR','M1PISC','M1ARCH'],
-  courseIds_m2: ['5BDA','5BIS','5DIG','5SEC'],
+  courseIds_m2: ['M2STREA','M2GOUVD','M2GESTP','M2INDU'],
   recommended_project: "Pipeline ETL temps réel avec Kafka + Spark (projet M1)",
   hard_skills: ['Python / Scala','Apache Spark & Kafka','SQL / NoSQL avancé','ETL / ELT pipelines','Cloud Data (AWS / GCP / Azure)','Data Warehousing (Snowflake, BigQuery)','Docker & Kubernetes','Airflow / orchestration'],
   softskillIds: ['SS01','SS10','SS05','SS08'],
@@ -221,7 +217,7 @@ const JOBS = [
   code_rome: 'M1805',
   description: "Le ML Engineer met en production les modèles de Machine Learning. Il industrialise le cycle de vie des modèles (entraînement, déploiement, monitoring) et construit les pipelines ML automatisés à grande échelle.",
   courseIds_m1: ['M1PYML','M1SPAR','M1MLOP','M1PISC','M1DISTR'],
-  courseIds_m2: ['5BDA','5DLA','5IAG','5DIG'],
+  courseIds_m2: ['M2IAAV','M2STREA','M2GOUVD','M2ETHI'],
   recommended_project: "Pipeline MLOps complet : training → déploiement → monitoring (projet M2)",
   hard_skills: ['Python (PyTorch, TensorFlow)','MLOps (MLflow, Kubeflow)','Docker & Kubernetes','CI/CD pour ML','Cloud ML (SageMaker, Vertex AI)','Feature Stores','Model Monitoring','API REST / gRPC'],
   softskillIds: ['SS01','SS10','SS04','SS05'],
@@ -241,7 +237,7 @@ const JOBS = [
   code_rome: 'M1805',
   description: "L'AI Engineer conçoit et déploie des solutions d'intelligence artificielle, notamment en IA générative (LLM, NLP, vision). Il maîtrise les architectures Transformer et les techniques de fine-tuning, RAG et prompt engineering.",
   courseIds_m1: ['M1PYML','M1MLOP','M1SPAR','M1DASC'],
-  courseIds_m2: ['5DLA','5IAG','5BDA','5DIG','5ETH'],
+  courseIds_m2: ['M2IAAV','M2GOUVD','M2ETHI','M2VEILL'],
   recommended_project: "Application GenAI avec RAG et fine-tuning LLM (projet M2)",
   hard_skills: ['Python (PyTorch, HuggingFace)','LLM & Transformers','RAG & Vector Databases','Prompt Engineering','NLP avancé','Fine-tuning & RLHF','API OpenAI / Anthropic / Mistral','MLOps pour GenAI'],
   softskillIds: ['SS06','SS04','SS05','SS02','SS08'],
@@ -261,7 +257,7 @@ const JOBS = [
   code_rome: 'M1805',
   description: "L'Architecte Big Data définit l'architecture technique des plateformes de données massives. Il choisit les technologies, conçoit les flux de données et garantit la scalabilité et la performance du SI décisionnel.",
   courseIds_m1: ['M1SPAR','M1DISTR','M1ARCH','M1PYML','M1PISC'],
-  courseIds_m2: ['5BDA','5BIS','5DIG','5SEC'],
+  courseIds_m2: ['M2GOUVD','M2STREA','M2INDU','M2GOUVI'],
   recommended_project: "Architecture data lake sur cloud (AWS / GCP) avec gouvernance (mémoire M2)",
   hard_skills: ['Architecture Data Lake / Lakehouse','Hadoop / Spark / Kafka','Cloud Data Platforms','Data Governance','SQL / NoSQL à grande échelle','Streaming temps réel','Sécurité des données','Modélisation dimensionnelle'],
   softskillIds: ['SS05','SS08','SS01','SS07'],
@@ -281,7 +277,7 @@ const JOBS = [
   code_rome: 'M1403',
   description: "Le Lead Data Analyst pilote l'analyse décisionnelle de l'entreprise. Il structure les KPI, crée les dashboards stratégiques et accompagne les métiers dans l'interprétation des données pour orienter les décisions business.",
   courseIds_m1: ['M1PYML','M1DASC','M1QUAL','M1MODE'],
-  courseIds_m2: ['5BIS','5DIG','5ECO'],
+  courseIds_m2: ['M2GOUVD','M2ETHI','M2VEILL'],
   recommended_project: "Dashboard décisionnel Power BI / Tanagra pour un cas métier réel (projet M2)",
   hard_skills: ['SQL avancé','Python (Pandas, Matplotlib)','Power BI / Tableau / Tanagra','Statistiques descriptives & inférentielles','Data Modeling','KPI & métriques business','Excel avancé (Power Query)','Data Quality Management'],
   softskillIds: ['SS02','SS12','SS05','SS08','SS07'],
@@ -301,7 +297,7 @@ const JOBS = [
   code_rome: 'M1802',
   description: "Le Consultant IA accompagne les organisations dans leur stratégie d'adoption de l'intelligence artificielle. Il identifie les cas d'usage à forte valeur, cadre les projets IA et fait le pont entre les équipes techniques et la direction.",
   courseIds_m1: ['M1DASC','M1PYML','M1GESTI','M1INNO'],
-  courseIds_m2: ['5DIG','5IAG','5ECO','5ETH','5BIS'],
+  courseIds_m2: ['M2IAAV','M2ETHI','M2VEILL','M2OFFR'],
   recommended_project: "Étude de cas : stratégie IA pour un secteur vertical (mémoire M2)",
   hard_skills: ['Cadrage de projets IA','Connaissance des architectures ML / DL','ROI & Business Case IA','Data Strategy',"Éthique de l'IA",'Gestion de la conduite du changement','Veille technologique IA','Frameworks de maturité IA'],
   softskillIds: ['SS05','SS08','SS07','SS04','SS06'],
@@ -321,7 +317,7 @@ const JOBS = [
   code_rome: 'M1805',
   description: "L'Architecte Logiciel conçoit l'architecture technique des applications complexes. Il définit les patterns, les technologies et les standards de développement pour garantir qualité, maintenabilité et scalabilité du code.",
   courseIds_m1: ['M1MODE','M1PISC','M1ARCH','M1QUAL','M1PROJ'],
-  courseIds_m2: ['5DIG','5SEC','5BIM','5DCR'],
+  courseIds_m2: ['M2INDU','M2OFFR','M2WEB3','M2VEILL'],
   recommended_project: "Architecture microservices avec documentation ADR (mémoire M2)",
   hard_skills: ['Design Patterns (GoF, SOLID)','Architecture microservices','API Design (REST, GraphQL, gRPC)','Cloud Architecture (AWS / Azure / GCP)','CI/CD & DevOps','Modélisation UML / C4','Performance & scalabilité','Sécurité applicative'],
   softskillIds: ['SS01','SS05','SS08','SS10','SS04'],
@@ -341,7 +337,7 @@ const JOBS = [
   code_rome: 'M1805',
   description: "Le Tech Lead est le référent technique d'une équipe de développement. Il code, revoit le code des autres, prend les décisions d'architecture au quotidien et mentore les développeurs juniors. C'est le pont entre le code et le management.",
   courseIds_m1: ['M1MODE','M1PISC','M1PROJ','M1GESTI','M1QUAL'],
-  courseIds_m2: ['5DIG','5SEC','5DCR'],
+  courseIds_m2: ['M2GESTP','M2INDU','M2VEILL'],
   recommended_project: "Lead technique d'un projet full-stack en équipe (projet M1)",
   hard_skills: ['Langages backend (Java, Python, Node.js)','Frontend (React, Angular, Vue)','Code Review & best practices','Git workflow avancé','Tests (TDD, BDD, E2E)','Architecture applicative','CI/CD','Mentoring technique'],
   softskillIds: ['SS01','SS10','SS04','SS11'],
@@ -361,7 +357,7 @@ const JOBS = [
   code_rome: 'M1805',
   description: "L'Ingénieur Full-Stack Senior maîtrise l'ensemble de la chaîne technique, du frontend au backend en passant par les bases de données et le déploiement. Il intervient sur toute l'architecture d'une application web moderne.",
   courseIds_m1: ['M1PISC','M1MODE','M1PROJ','M1ARCH','M1QUAL'],
-  courseIds_m2: ['5SEC','5DIG','5BIM'],
+  courseIds_m2: ['M2INDU','M2GESTP','M2WEB3'],
   recommended_project: "Application web complète (React + API + BDD + Docker) en autonomie",
   hard_skills: ['React / Vue / Angular','Node.js / Django / Spring Boot','PostgreSQL / MongoDB','API REST & GraphQL','Docker & CI/CD','TypeScript','Tests automatisés','Performance & monitoring'],
   softskillIds: ['SS10','SS01','SS04','SS11'],
@@ -383,7 +379,7 @@ const JOBS = [
   code_rome: 'M1802',
   description: "Le Pentester Senior simule des cyberattaques pour identifier les vulnérabilités des systèmes. En tant que Red Team Lead, il planifie et dirige des campagnes d'intrusion avancées pour tester la posture de sécurité globale de l'entreprise.",
   courseIds_m1: ['M1PENT','M1BLUR','M1CRYP','M1SECUA','M1APPW'],
-  courseIds_m2: ['5SOA','5SOP','5SEC','5SPC'],
+  courseIds_m2: ['M2PENT','M2PYTS','M2GOUVI','M2SECM'],
   recommended_project: "Audit de sécurité complet d'une infrastructure (projet M2)",
   hard_skills: ["Tests d'intrusion (Metasploit, Burp Suite)",'Red Team Operations','Exploitation de vulnérabilités','Scripting (Python, Bash)','Analyse réseau (Wireshark, Nmap)','OWASP Top 10','Social Engineering','Rapport d’audit sécurité'],
   softskillIds: ['SS03','SS01','SS06','SS08','SS11'],
@@ -403,7 +399,7 @@ const JOBS = [
   code_rome: 'M1802',
   description: "L'Analyste SOC Senior surveille et défend le SI en temps réel. Il détecte les incidents de sécurité, coordonne la réponse et améliore en continu les règles de détection. En Blue Team Lead, il manage une équipe de défense.",
   courseIds_m1: ['M1BLUR','M1INTR','M1CRYP','M1APPW','M1SECUA'],
-  courseIds_m2: ['5SOA','5SOP','5SEC','5NAC'],
+  courseIds_m2: ['M2GOUVI','M2PYTS','M2PENT','M2SECM'],
   recommended_project: "Mise en place d'un SOC lab avec SIEM (ELK/Splunk) et playbooks de réponse",
   hard_skills: ['SIEM (Splunk, ELK, QRadar)','Threat Detection & Hunting','Incident Response','MITRE ATT&CK Framework','Log Analysis','Network Security Monitoring','Malware Analysis (base)','Automatisation SOAR'],
   softskillIds: ['SS03','SS01','SS05','SS08'],
@@ -423,7 +419,7 @@ const JOBS = [
   code_rome: 'M1802',
   description: "Le RSSI définit et pilote la politique de sécurité de l'information de l'organisation. Il évalue les risques, met en œuvre les mesures de protection, assure la conformité réglementaire et sensibilise les collaborateurs à la cybersécurité.",
   courseIds_m1: ['M1INTR','M1CRYP','M1GESTI','M1QUAL','M1APPW'],
-  courseIds_m2: ['5SEC','5SOP','5DCR','5DIG','5ECO'],
+  courseIds_m2: ['M2GOUVI','M2VEILL','M2PCAG','M2GESTP'],
   recommended_project: "Politique de sécurité ISO 27001 pour une PME (mémoire M2)",
   hard_skills: ['ISO 27001 / 27002','Analyse de risques (EBIOS RM, ISO 27005)','Gouvernance SSI','RGPD & conformité',"Plan de continuité d'activité (PCA / PRA)",'Sensibilisation & formation sécu','Pilotage budgétaire SSI','Gestion de crise cyber'],
   softskillIds: ['SS05','SS09','SS08','SS01','SS07'],
@@ -443,7 +439,7 @@ const JOBS = [
   code_rome: 'M1802',
   description: "Le Consultant Cybersécurité intervient en mission chez des clients pour auditer, conseiller et implémenter des solutions de sécurité. Il couvre un large spectre : GRC, technique, organisationnel, et accompagne les transformations sécurité.",
   courseIds_m1: ['M1INTR','M1CRYP','M1PENT','M1GESTI','M1QUAL'],
-  courseIds_m2: ['5SEC','5SOA','5SOP','5DIG','5DCR'],
+  courseIds_m2: ['M2GOUVI','M2PENT','M2VEILL','M2PCAG'],
   recommended_project: "Audit de maturité cyber chez un client réel (stage M2)",
   hard_skills: ['Audit sécurité (technique & organisationnel)','ISO 27001 / NIST / ANSSI','Analyse de risques','Architecture sécurisée','Rédaction de livrables','Veille vulnérabilités',"Tests d'intrusion (base)",'Conformité RGPD'],
   softskillIds: ['SS08','SS05','SS09','SS07','SS11'],
@@ -463,7 +459,7 @@ const JOBS = [
   code_rome: 'M1802',
   description: "L'Auditeur Sécurité ISO 27001 évalue la conformité des systèmes d'information aux normes de sécurité internationales. Il réalise des audits internes et externes, identifie les non-conformités et propose des plans d'action correctifs.",
   courseIds_m1: ['M1QUAL','M1INTR','M1GESTI','M1CRYP'],
-  courseIds_m2: ['5SEC','5SOP','5DCR','5ECO','5DIG'],
+  courseIds_m2: ['M2GOUVI','M2VEILL','M2PCAG','M2ETHI'],
   recommended_project: "Audit blanc ISO 27001 sur un périmètre réel (stage M2)",
   hard_skills: ['Audit ISO 27001 / 27002',"ISO 19011 (techniques d'audit)",'EBIOS RM / MEHARI',"Rédaction de rapports d'audit",'Plan d\'action corrective','Cartographie des risques','Conformité RGPD','Contrôle interne SI'],
   softskillIds: ['SS09','SS08','SS07','SS05','SS06'],
@@ -483,7 +479,7 @@ const JOBS = [
   code_rome: 'M1802',
   description: "Le Cloud Security Engineer sécurise les environnements cloud (AWS, Azure, GCP). Il implémente les contrôles de sécurité, gère les identités et accès (IAM), et détecte les configurations à risque dans les architectures cloud.",
   courseIds_m1: ['M1ARCH','M1CRYP','M1PISC','M1INTR','M1APPW'],
-  courseIds_m2: ['5SPC','5AWS','5SEC','5NAC'],
+  courseIds_m2: ['M2PYTS','M2GOUVI','M2SECM'],
   recommended_project: "Sécurisation d'une infrastructure AWS multi-comptes (projet M2)",
   hard_skills: ['AWS / Azure / GCP Security','IAM & Zero Trust','Cloud Security Posture Management','Container Security (K8s)','Infrastructure as Code (Terraform)','SIEM Cloud (CloudTrail, GuardDuty)','Network Security cloud','Compliance frameworks cloud'],
   softskillIds: ['SS03','SS05','SS01','SS09'],
@@ -503,7 +499,7 @@ const JOBS = [
   code_rome: 'M1801',
   description: "L'Architecte Réseaux conçoit et planifie l'infrastructure réseau de l'entreprise : LAN, WAN, SD-WAN, Wi-Fi, segmentation. Il garantit performance, résilience et sécurité de l'ensemble des communications.",
   courseIds_m1: ['M1ARCH','M1CRYP','M1INTR','M1QUAL'],
-  courseIds_m2: ['5NAC','5SEC','5SPC','5AWS','5DIG'],
+  courseIds_m2: ['M2INDU','M2SECM','M2GOUVI','M2PYTS'],
   recommended_project: "Design réseau SD-WAN multi-site sécurisé (mémoire M2)",
   hard_skills: ['Architecture LAN / WAN / SD-WAN','Cisco / Juniper / Fortinet','Protocoles (BGP, OSPF, VXLAN)','Sécurité réseau (firewall, IDS/IPS)','Wi-Fi Enterprise','Network Automation (Ansible)','Monitoring (SNMP, Zabbix)','Virtualisation réseau (NSX)'],
   softskillIds: ['SS05','SS01','SS08','SS09'],
@@ -523,7 +519,7 @@ const JOBS = [
   code_rome: 'M1810',
   description: "L'Ingénieur Systèmes & Réseaux Senior administre et fait évoluer l'infrastructure IT : serveurs, réseaux, virtualisation, stockage. Il assure la disponibilité, la performance et la sécurité de l'ensemble du SI.",
   courseIds_m1: ['M1ARCH','M1PISC','M1INTR','M1QUAL','M1CRYP'],
-  courseIds_m2: ['5NAC','5SEC','5AWS','5SPC'],
+  courseIds_m2: ['M2INDU','M2PCAG','M2SECM','M2PYTS'],
   recommended_project: "Migration d'infrastructure on-premise vers hybrid cloud (stage M2)",
   hard_skills: ['Linux / Windows Server','VMware / Hyper-V','Active Directory / LDAP','Scripting (Bash, PowerShell)','Monitoring (Nagios, Zabbix, Grafana)','Backup & disaster recovery','Réseau (switching, routing, VLAN)','Automatisation (Ansible, Puppet)'],
   softskillIds: ['SS10','SS01','SS03','SS09'],
@@ -543,7 +539,7 @@ const JOBS = [
   code_rome: 'M1802',
   description: "L'Expert Forensic investigue les incidents de sécurité et les cyberattaques. Il collecte et analyse les preuves numériques, reconstitue la chronologie des attaques et produit des rapports d'investigation exploitables juridiquement.",
   courseIds_m1: ['M1BLUR','M1PENT','M1SECUA','M1INTR','M1CRYP'],
-  courseIds_m2: ['5SOA','5SOP','5SEC','5DCR'],
+  courseIds_m2: ['M2PENT','M2GOUVI','M2PYTS','M2VEILL'],
   recommended_project: "Investigation forensic sur un scénario de compromission simulé (projet M2)",
   hard_skills: ['Forensic (Autopsy, Volatility, FTK)','Incident Response (NIST SP 800-61)','Malware Analysis','Log Analysis & Timeline','Chain of Custody','Reverse Engineering (base)','OSINT','Rédaction rapport forensic'],
   softskillIds: ['SS03','SS08','SS06','SS09','SS11'],
@@ -565,7 +561,7 @@ const JOBS = [
   code_rome: 'M1805',
   description: "L'Architecte Cloud conçoit les architectures cloud complètes (IaaS, PaaS, SaaS) en intégrant sécurité, performance, coûts et scalabilité. Il traduit les besoins métiers en solutions techniques cloud-native.",
   courseIds_m1: ['M1ARCH','M1PISC','M1QUAL','M1INTR'],
-  courseIds_m2: ['5AWS','5SPC','5SEC','5DIG','5NAC'],
+  courseIds_m2: ['M2GOUVD','M2PYTS','M2INDU','M2GOUVI'],
   recommended_project: "Architecture cloud multi-region haute disponibilité (mémoire M2)",
   hard_skills: ['AWS / Azure / GCP Architecture','Infrastructure as Code (Terraform, CDK)','Kubernetes & conteneurs','Serverless Architecture','Cloud Networking','Cost Optimization (FinOps)','Haute disponibilité / DR','Well-Architected Framework'],
   softskillIds: ['SS05','SS08','SS01','SS07'],
@@ -585,7 +581,7 @@ const JOBS = [
   code_rome: 'M1805',
   description: "Le DevOps / SRE Engineer automatise les déploiements, gère l'infrastructure as code et garantit la fiabilité des systèmes en production. Il est au carrefour du développement et de l'exploitation, avec un focus sur l'automatisation.",
   courseIds_m1: ['M1PISC','M1ARCH','M1PROJ','M1QUAL','M1INTR'],
-  courseIds_m2: ['5AWS','5SEC','5NAC','5DIG'],
+  courseIds_m2: ['M2INDU','M2GESTP','M2PCAG','M2PYTS'],
   recommended_project: "Pipeline CI/CD complet avec infra as code et monitoring (projet M1 / M2)",
   hard_skills: ['Docker & Kubernetes','CI/CD (GitLab CI, GitHub Actions, Jenkins)','Terraform / Ansible / Pulumi','Monitoring (Prometheus, Grafana, Datadog)','Linux Administration avancée','Cloud (AWS / GCP / Azure)','Scripting (Bash, Python)','SLO / SLA / Error Budgets'],
   softskillIds: ['SS10','SS01','SS03','SS04'],
@@ -605,7 +601,7 @@ const JOBS = [
   code_rome: 'M1805',
   description: "Le DevSecOps Engineer intègre la sécurité dans chaque étape du cycle de développement et de déploiement. Il automatise les tests de sécurité (SAST, DAST, SCA), sécurise les pipelines CI/CD et forme les développeurs aux bonnes pratiques.",
   courseIds_m1: ['M1PISC','M1APPW','M1PENT','M1PROJ','M1INTR'],
-  courseIds_m2: ['5SEC','5SOA','5SPC','5AWS'],
+  courseIds_m2: ['M2PYTS','M2PENT','M2GOUVI','M2INDU'],
   recommended_project: "Intégration sécurité dans un pipeline CI/CD existant (projet M2)",
   hard_skills: ['SAST / DAST / SCA (SonarQube, Snyk, OWASP ZAP)','Sécurité des conteneurs','Pipeline sécurisé (GitLab / GitHub)','Secret Management (Vault)','Infrastructure as Code sécurisé','Compliance as Code','Shift-Left Security','Threat Modeling'],
   softskillIds: ['SS03','SS01','SS10','SS06'],
@@ -625,7 +621,7 @@ const JOBS = [
   code_rome: 'M1802',
   description: "Le Consultant en Transformation Numérique accompagne les organisations dans leur mutation digitale. Il définit les roadmaps technologiques, pilote les programmes de changement et aligne la stratégie IT sur les objectifs business.",
   courseIds_m1: ['M1GESTI','M1QUAL','M1MODE','M1INNO','M1PROJ'],
-  courseIds_m2: ['5DIG','5ECO','5ETH','5BIM','5DCR'],
+  courseIds_m2: ['M2OFFR','M2GESTP','M2VEILL','M2WEB3','M2ETHI'],
   recommended_project: "Plan de transformation numérique pour une PME / ETI (mémoire M2)",
   hard_skills: ['Stratégie digitale','Gestion du changement','Business Process Reengineering','Architecture SI (urbanisation)','Gestion de programme','Agilité à l\'échelle (SAFe)','ROI & Business Case','Connaissance technos émergentes (IA, Cloud, IoT)'],
   softskillIds: ['SS05','SS08','SS07','SS04','SS06'],
@@ -645,7 +641,7 @@ const JOBS = [
   code_rome: 'M1805',
   description: "Le Chef de Projet IT Senior pilote des projets technologiques complexes de bout en bout. Il manage les équipes, les budgets, les délais et les risques. Le Product Manager technique définit la vision produit et priorise le backlog.",
   courseIds_m1: ['M1GESTI','M1PROJ','M1QUAL','M1MODE','M1INNO'],
-  courseIds_m2: ['5DIG','5DCR','5ECO','5ETH'],
+  courseIds_m2: ['M2GESTP','M2OFFR','M2VEILL','M2ETHI'],
   recommended_project: "Gestion de projet complet en mode Agile avec livrables réels (projet M1 / M2)",
   hard_skills: ['Gestion de projet Agile (Scrum, Kanban)','Pilotage budgétaire','Gestion des risques','JIRA / Confluence / Notion','Product Management','Méthodes SAFe / Scrum@Scale','Reporting & KPI','Cahier des charges & specs'],
   softskillIds: ['SS01','SS10','SS08','SS04','SS07'],
@@ -665,7 +661,7 @@ const JOBS = [
   code_rome: 'M1802',
   description: "Le DPO veille au respect du RGPD et des réglementations de protection des données personnelles. Il conseille l'organisation, réalise les analyses d'impact (AIPD), tient le registre des traitements et est l'interlocuteur de la CNIL.",
   courseIds_m1: ['M1INTR','M1QUAL','M1GESTI'],
-  courseIds_m2: ['5DCR','5ETH','5SEC','5DIG','5ECO'],
+  courseIds_m2: ['M2VEILL','M2ETHI','M2GOUVI','M2GOUVD'],
   recommended_project: "Mise en conformité RGPD d'une organisation réelle (mémoire M2)",
   hard_skills: ['RGPD (texte, jurisprudence)','Analyse d\'impact (AIPD / PIA)','Registre des traitements','Privacy by Design','Gouvernance des données','Droit du numérique','Gestion des violations de données','Relation CNIL / autorités'],
   softskillIds: ['SS09','SS05','SS08','SS06','SS07'],
@@ -685,7 +681,7 @@ const JOBS = [
   code_rome: 'M1805',
   description: "L'Entrepreneur Tech / CTO Startup crée ou co-fonde une startup technologique. Il définit la vision technique, recrute et manage l'équipe tech, fait les choix d'architecture et pilote le produit de l'idée au marché.",
   courseIds_m1: ['M1PROJ','M1GESTI','M1INNO','M1PISC','M1MODE'],
-  courseIds_m2: ['5DIG','5ECO','5DCR','5ETH','5BIM'],
+  courseIds_m2: ['M2GESTP','M2WEB3','M2OFFR','M2VEILL','M2ETHI'],
   recommended_project: "Création d'une startup tech (incubateur / projet M1 + mémoire M2)",
   hard_skills: ['Architecture technique full-stack','Product Management','Recrutement tech','Levée de fonds (pitch deck)','Choix technologiques stratégiques','MVP & itérations rapides','Business Model Canvas','Growth hacking technique'],
   softskillIds: ['SS04','SS01','SS05','SS08','SS07'],
@@ -705,7 +701,7 @@ const JOBS = [
   code_rome: 'M1805',
   description: "L'Engineering Manager manage une ou plusieurs équipes de développement. Il recrute, fait grandir les ingénieurs, garantit la qualité technique et aligne la production tech avec les objectifs business. C'est un rôle à 50% people, 50% tech.",
   courseIds_m1: ['M1GESTI','M1PROJ','M1QUAL','M1MODE','M1INNO'],
-  courseIds_m2: ['5DIG','5ECO','5ETH','5DCR'],
+  courseIds_m2: ['M2GESTP','M2INDU','M2VEILL','M2ETHI'],
   recommended_project: "Management d'une équipe de 4-6 devs sur un projet réel (stage M2)",
   hard_skills: ['People Management','Recrutement technique','Career Development (IC / Manager)','Architecture (lecture, pas écriture)','Process Engineering (Agile, Kanban)','Métriques DORA','Gestion de la dette technique','Stakeholder Management'],
   softskillIds: ['SS01','SS05','SS08','SS04','SS06'],
@@ -1939,10 +1935,11 @@ const MatrixScreen = ({ onSelectJob, preselectedCourseId }) => {
     const m1T1     = COURSES.filter(c => c.year==='M1' && c.spec==='t1');
     const m1T2     = COURSES.filter(c => c.year==='M1' && c.spec==='t2');
     const m2Common = COURSES.filter(c => c.year==='M2' && c.spec==='common' && c.unit==='U1');
-    const m2T1     = COURSES.filter(c => c.year==='M2' && c.spec==='t1');
-    const m2T2     = COURSES.filter(c => c.year==='M2' && c.spec==='t2');
-    const m2U3     = COURSES.filter(c => c.year==='M2' && c.unit==='U3');
-    return { m1Common, m1T1, m1T2, m2Common, m2T1, m2T2, m2U3 };
+    const m2U2T1   = COURSES.filter(c => c.year==='M2' && c.spec==='t1' && c.unit==='U2');
+    const m2U2T2   = COURSES.filter(c => c.year==='M2' && c.spec==='t2' && c.unit==='U2');
+    const m2U3T1   = COURSES.filter(c => c.year==='M2' && c.spec==='t1' && c.unit==='U3');
+    const m2U3T2   = COURSES.filter(c => c.year==='M2' && c.spec==='t2' && c.unit==='U3');
+    return { m1Common, m1T1, m1T2, m2Common, m2U2T1, m2U2T2, m2U3T1, m2U3T2 };
   }, []);
 
   const linkedJobs = useMemo(() => {
@@ -2017,17 +2014,20 @@ const MatrixScreen = ({ onSelectJob, preselectedCourseId }) => {
           <SubHead color={C.t2}>M1 — Spé Cybersécurité (T2)</SubHead>
           {groups.m1T2.map(c => <CourseBtn key={c.id} c={c}/>)}
 
-          <SubHead color={C.trans}>M2 — Tronc commun</SubHead>
+          <SubHead color={C.trans}>M2 — Tronc commun (U1)</SubHead>
           {groups.m2Common.map(c => <CourseBtn key={c.id} c={c}/>)}
 
-          <SubHead color={C.t1}>M2 — Spé IA (T1)</SubHead>
-          {groups.m2T1.map(c => <CourseBtn key={c.id} c={c}/>)}
+          <SubHead color={C.t1}>M2 U2 — Spé IA / Data</SubHead>
+          {groups.m2U2T1.map(c => <CourseBtn key={c.id} c={c}/>)}
 
-          <SubHead color={C.t2}>M2 — Spé Cyber (T2)</SubHead>
-          {groups.m2T2.map(c => <CourseBtn key={c.id} c={c}/>)}
+          <SubHead color={C.t2}>M2 U2 — Spé CyberSécu</SubHead>
+          {groups.m2U2T2.map(c => <CourseBtn key={c.id} c={c}/>)}
 
-          <SubHead color={C.trans}>M2 — U3</SubHead>
-          {groups.m2U3.map(c => <CourseBtn key={c.id} c={c}/>)}
+          <SubHead color={C.t1}>M2 U3 — IA / Data</SubHead>
+          {groups.m2U3T1.map(c => <CourseBtn key={c.id} c={c}/>)}
+
+          <SubHead color={C.t2}>M2 U3 — CyberSécu</SubHead>
+          {groups.m2U3T2.map(c => <CourseBtn key={c.id} c={c}/>)}
         </Card>
 
         <Card hover={false}>
