@@ -2272,7 +2272,7 @@ const RecognitionScreen = () => {
           boxShadow: `0 4px 20px ${C.trans}22`
         }}>
           <Globe size={22} color={C.trans}/>
-          Reconnu dans 30+ pays européens · Accords internationaux
+          Reconnu dans 49 pays · Processus de Bologne + accords internationaux
         </div>
       </div>
 
@@ -2313,7 +2313,7 @@ const RecognitionScreen = () => {
       <Card hover={false} style={{ maxWidth: 900, margin: '0 auto 24px auto' }}>
         <SectionTitle icon={Globe} color={C.trans}>Mobilité directe — 11 marchés cibles IT / francophonie</SectionTitle>
         <p style={{ fontSize: 16, color: C.fgDim, margin: '0 0 16px 0', lineHeight: 1.5 }}>
-          Ces pays sont notre shortlist pour l'emploi IT et les salaires connus. Le diplôme reste reconnu dans l'ensemble de l'UE/EEE via le Processus de Bologne.
+          Ces pays sont notre shortlist pour l'emploi IT et les salaires connus. Le diplôme reste reconnu dans l'ensemble des 49 pays signataires du Processus de Bologne.
         </p>
         <div style={{ display:'flex', justifyContent:'center' }}>
           <EuropeMap highlighted={euHighlighted} size="lg" />
@@ -2364,7 +2364,7 @@ const RecognitionScreen = () => {
                 { flag: '🇦🇺', name: 'Australie', note: 'via AEI-NOOSR' },
                 { flag: '🇦🇪', name: 'Émirats Arabes Unis', note: 'Évaluation ministérielle' },
                 { flag: '🇸🇬', name: 'Singapour', note: 'Évaluation dossier' },
-                { flag: '🌍', name: '100+ autres pays', note: 'Réseau ENIC-NARIC' }
+                { flag: '🌍', name: '100+ pays', note: 'ENIC-NARIC + WES + agences d\'évaluation' }
               ].map((c, i) => (
                 <div key={i} style={{
                   display:'flex', alignItems:'center', gap: 12,
