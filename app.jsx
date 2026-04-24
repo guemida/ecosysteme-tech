@@ -4,7 +4,7 @@ import * as d3 from 'd3';
 import {
   Database, Brain, Code, Shield, Network, Cloud, Users,
   Sparkles, LayoutGrid, User, BookOpen, GitCompare, Award,
-  ChevronLeft, ChevronRight, Search, Presentation, Eye,
+  ChevronLeft, ChevronRight, Search, Presentation, Eye, X,
   Briefcase, TrendingUp, Star, Target, Zap,
   Euro, BadgeCheck, Globe, Rocket, GraduationCap,
   Flame, AlertTriangle, CheckCircle2, Laptop, Trophy, BookOpenCheck,
@@ -2411,6 +2411,206 @@ const RecognitionScreen = () => {
 };
 
 /* ============================================================
+   INTRO MODAL — first-load overview popup
+   ============================================================ */
+
+const IntroModal = ({ onClose }) => {
+  useEffect(() => {
+    const onKey = (e) => {
+      if (e.key === 'Enter' || e.key === 'Escape' || e.key === ' ') {
+        e.preventDefault();
+        onClose();
+      }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [onClose]);
+
+  const stats = [
+    { value: '27',     label: 'métiers',         color: C.t1,      icon: Briefcase },
+    { value: 'Bac+5',  label: 'RNCP Niveau 7',   color: C.trans,   icon: GraduationCap },
+    { value: '77k€',   label: 'salaire senior moyen', color: C.success, icon: Euro },
+    { value: '49',     label: 'pays reconnus',   color: C.t2,      icon: Globe }
+  ];
+
+  const screens = [
+    { icon: Sparkles,   title: 'Constellation',       desc: "27 métiers en un coup d'œil",         color: C.t1 },
+    { icon: LayoutGrid, title: 'Grille',              desc: 'Filtrer par salaire, tension, famille', color: C.trans },
+    { icon: User,       title: 'Fiche métier',        desc: 'Parcours, compétences, évolution',     color: C.t2 },
+    { icon: BookOpen,   title: 'Matière → Métiers',   desc: 'Comment les cours préparent chaque métier', color: '#06B6D4' },
+    { icon: GitCompare, title: 'Comparaison',         desc: '2-3 métiers côte à côte',              color: '#EC4899' },
+    { icon: Award,      title: 'Reconnaissance',      desc: 'Votre Bac+5 reconnu en Europe',        color: C.success }
+  ];
+
+  return (
+    <div
+      onClick={onClose}
+      style={{
+        position: 'fixed', inset: 0, zIndex: 500,
+        background: 'rgba(2,6,23,0.78)',
+        backdropFilter: 'blur(20px)',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        padding: 24,
+        animation: 'fadeIn 350ms ease',
+        fontFamily: FONT
+      }}
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
+        style={{
+          maxWidth: 940, width: '100%',
+          maxHeight: '92vh', overflowY: 'auto',
+          background: `linear-gradient(160deg, rgba(30,41,59,0.95), rgba(15,23,42,0.98))`,
+          border: `1px solid ${C.border}`,
+          borderRadius: 24,
+          padding: '48px 48px 40px 48px',
+          position: 'relative',
+          boxShadow: `0 24px 80px rgba(2,6,23,0.9), 0 0 120px ${C.trans}33`
+        }}
+      >
+        {/* Close button */}
+        <button
+          onClick={onClose}
+          title="Fermer (Échap)"
+          style={{
+            position: 'absolute', top: 20, right: 20,
+            width: 42, height: 42, borderRadius: 10,
+            background: 'rgba(148,163,184,0.12)',
+            border: `1px solid ${C.border}`,
+            color: C.fg, cursor: 'pointer',
+            display: 'flex', alignItems: 'center', justifyContent: 'center'
+          }}
+        >
+          <X size={22}/>
+        </button>
+
+        {/* Logo + Hook */}
+        <div style={{ textAlign: 'center', marginBottom: 32 }}>
+          <div style={{
+            width: 72, height: 72, borderRadius: 20,
+            background: `linear-gradient(135deg, ${C.t1}, ${C.trans}, ${C.t2})`,
+            margin: '0 auto 18px auto',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            boxShadow: `0 12px 36px ${C.trans}66`
+          }}>
+            <Sparkles size={36} color="#fff"/>
+          </div>
+
+          <div style={{
+            fontSize: 15, fontWeight: 700, color: C.trans,
+            letterSpacing: '0.14em', textTransform: 'uppercase',
+            marginBottom: 10
+          }}>
+            Galaxia Métiers IT
+          </div>
+
+          <h1 style={{
+            fontSize: 42, fontWeight: 800, margin: 0, lineHeight: 1.15,
+            letterSpacing: '-0.02em',
+            background: `linear-gradient(120deg, ${C.t1}, ${C.trans}, ${C.t2})`,
+            WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text'
+          }}>
+            27 métiers pour construire<br/>votre avenir numérique
+          </h1>
+          <p style={{ fontSize: 19, color: C.fgDim, marginTop: 14, fontWeight: 500 }}>
+            Bac+5 · Master européen · Reconnu dans <strong style={{ color: C.fg }}>49 pays</strong>
+          </p>
+        </div>
+
+        {/* Stats */}
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(4,1fr)',
+          gap: 12, marginBottom: 32
+        }}>
+          {stats.map((s, i) => {
+            const Icon = s.icon;
+            return (
+              <div key={i} style={{
+                padding: '18px 12px', borderRadius: 14,
+                background: `${s.color}1A`,
+                border: `1px solid ${s.color}55`,
+                textAlign: 'center'
+              }}>
+                <Icon size={20} color={s.color} style={{ marginBottom: 4 }}/>
+                <div style={{ fontSize: 30, fontWeight: 800, color: s.color, letterSpacing: '-0.02em', lineHeight: 1.1 }}>
+                  {s.value}
+                </div>
+                <div style={{ fontSize: 14, color: C.fgDim, marginTop: 6, fontWeight: 600, lineHeight: 1.3 }}>
+                  {s.label}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* What's inside */}
+        <div style={{ marginBottom: 30 }}>
+          <div style={{
+            fontSize: 14, color: C.muted, fontWeight: 700,
+            letterSpacing: '0.1em', textTransform: 'uppercase',
+            marginBottom: 14, textAlign: 'center'
+          }}>
+            Ce que vous allez explorer
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+            {screens.map((s, i) => {
+              const Icon = s.icon;
+              return (
+                <div key={i} style={{
+                  display: 'flex', alignItems: 'center', gap: 12,
+                  padding: '12px 14px', borderRadius: 10,
+                  background: 'rgba(15,23,42,0.6)',
+                  border: `1px solid ${s.color}44`
+                }}>
+                  <div style={{
+                    width: 38, height: 38, borderRadius: 9,
+                    background: `${s.color}33`, color: s.color,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    flexShrink: 0
+                  }}>
+                    <Icon size={18}/>
+                  </div>
+                  <div style={{ minWidth: 0 }}>
+                    <div style={{ fontSize: 16, fontWeight: 700, color: C.fg }}>{s.title}</div>
+                    <div style={{ fontSize: 14, color: C.muted, lineHeight: 1.35 }}>{s.desc}</div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* CTA */}
+        <div style={{ textAlign: 'center' }}>
+          <button
+            onClick={onClose}
+            style={{
+              padding: '16px 40px',
+              fontSize: 19, fontWeight: 700, fontFamily: FONT,
+              background: `linear-gradient(135deg, ${C.t1}, ${C.trans})`,
+              color: '#fff', border: 'none', borderRadius: 14,
+              cursor: 'pointer',
+              display: 'inline-flex', alignItems: 'center', gap: 10,
+              boxShadow: `0 10px 32px ${C.trans}66`,
+              transition: 'transform 150ms'
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-2px)'}
+            onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
+          >
+            Commencer la présentation
+            <ChevronRight size={22}/>
+          </button>
+          <div style={{ fontSize: 14, color: C.muted, marginTop: 14 }}>
+            Raccourcis : <strong style={{ color: C.fgDim }}>1-6</strong> pour naviguer · <strong style={{ color: C.fgDim }}>←/→</strong> entre fiches · <strong style={{ color: C.fgDim }}>i</strong> pour revoir cette intro
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+/* ============================================================
    APP — main container + routing + keyboard
    ============================================================ */
 
@@ -2420,6 +2620,7 @@ const App = () => {
   const [presentMode, setPresentMode] = useState(false);
   const [fadeKey, setFadeKey] = useState(0);
   const [matrixCourseId, setMatrixCourseId] = useState(null);
+  const [showIntro, setShowIntro] = useState(true);
 
   const goto = (id) => { setScreen(id); setFadeKey(k => k+1); };
   const selectJob = (jobId) => {
@@ -2436,6 +2637,8 @@ const App = () => {
   useEffect(() => {
     const onKey = (e) => {
       if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT' || e.target.tagName === 'TEXTAREA') return;
+      if (showIntro) return;
+      if (e.key.toLowerCase() === 'i') { setShowIntro(true); return; }
       const num = parseInt(e.key, 10);
       if (num >= 1 && num <= 6) { goto(SCREENS[num-1].id); return; }
       if (e.key === 'F11' || (e.ctrlKey && e.key.toLowerCase() === 'f')) {
@@ -2450,7 +2653,7 @@ const App = () => {
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [screen, selectedJobId]);
+  }, [screen, selectedJobId, showIntro]);
 
   return (
     <div style={{
@@ -2461,6 +2664,8 @@ const App = () => {
       color: C.fg,
       paddingTop: presentMode ? 0 : 74
     }}>
+      {showIntro && <IntroModal onClose={() => setShowIntro(false)} />}
+
       <Navbar current={screen} onChange={goto}
         onTogglePresent={() => setPresentMode(p => !p)}
         presentMode={presentMode} />
