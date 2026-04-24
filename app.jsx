@@ -1336,6 +1336,7 @@ const ConstellationScreen = ({ onSelectJob }) => {
         <Stat icon={Euro}     value={`${STATS.avgSenior}k€`} label="salaire senior moyen" color={C.success} />
         <Stat icon={GraduationCap} value={STATS.ects}  label="crédits ECTS"       color={C.t1} />
         <Stat icon={Shield}   value="424k" label="postes cyber à pourvoir en Europe" color={C.pink} />
+        <Stat icon={Brain}    value="+40 %/an" label="croissance rôles IA d'ici 2030" color={C.trans} />
       </div>
     </div>
   );
