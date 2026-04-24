@@ -34,10 +34,10 @@ const C = {
 const TITLES = [
   { id: 't1', code: 'RNCP38822', niveau: 7, rome: 'M1805', color: C.t1,
     name: 'Expert en Architecture et Développement Logiciel',
-    short: 'Titre 1 — Dev / IA / Data' },
+    short: 'IA / Data' },
   { id: 't2', code: 'RNCP38823', niveau: 7, rome: 'M1801 · M1802 · M1810', color: C.t2,
     name: 'Expert en Architectures Systèmes, Réseaux et Sécurité',
-    short: 'Titre 2 — Sys / Rés / Sécu' }
+    short: 'CyberSecu' }
 ];
 
 const FAMILIES = {
@@ -554,7 +554,7 @@ const JOBS = [
   passerelles: ['j11','j12','j14']
 },
 
-/* ============== TRANSVERSES (Titre 1 ET 2) ============== */
+/* ============== TRANSVERSES (IA/Data ET CyberSecu) ============== */
 {
   id: 'j20', name: 'Architecte Cloud / Solutions Architect', short: 'Arch. Cloud',
   synonyms_fr: ['Architecte solutions cloud'],
@@ -745,8 +745,8 @@ const jobTitleLabel = (job) => {
   const hasT1 = job.titleIds.includes('t1');
   const hasT2 = job.titleIds.includes('t2');
   if (hasT1 && hasT2) return 'Transverse';
-  if (hasT1) return 'Titre 1';
-  return 'Titre 2';
+  if (hasT1) return 'IA/Data';
+  return 'CyberSecu';
 };
 
 /* ============================================================
@@ -853,8 +853,8 @@ const TitleBadge = ({ titleIds }) => {
   const hasT1 = titleIds.includes('t1');
   const hasT2 = titleIds.includes('t2');
   if (hasT1 && hasT2) return <Badge color={C.trans} filled={false}>Transverse (T1 + T2)</Badge>;
-  if (hasT1) return <Badge color={C.t1} filled={false}>Titre 1 — RNCP38822</Badge>;
-  return <Badge color={C.t2} filled={false}>Titre 2 — RNCP38823</Badge>;
+  if (hasT1) return <Badge color={C.t1} filled={false}>IA/Data — RNCP38822</Badge>;
+  return <Badge color={C.t2} filled={false}>CyberSecu — RNCP38823</Badge>;
 };
 
 const SectionTitle = ({ icon:Icon, children, color=C.t1 }) => (
@@ -1006,7 +1006,7 @@ const Navbar = ({ current, onChange, onTogglePresent, presentMode }) => (
       </div>
       <div style={{ lineHeight: 1.2 }}>
         <div style={{ fontSize: 18, fontWeight: 700, color: C.fg }}>Galaxia Métiers IT</div>
-        <div style={{ fontSize: 13, color: C.muted }}>27 métiers · Bac+5 RNCP Niveau 7</div>
+        <div style={{ fontSize: 13, color: C.muted }}>27 métiers · Bac+5 · RNCP N7</div>
       </div>
     </div>
 
@@ -1277,7 +1277,7 @@ const ConstellationScreen = ({ onSelectJob }) => {
           27 métiers accessibles avec votre Bac+5
         </h1>
         <p style={{ fontSize: 22, color: C.fgDim, marginTop: 10, fontWeight: 500 }}>
-          2 spécialisations · Niveau 7 (Master) · 300 ECTS · Reconnu dans toute l'Europe
+          2 spécialisations · Bac+5 · 300 ECTS · Reconnu dans toute l'Europe
         </p>
       </div>
 
@@ -1319,8 +1319,8 @@ const ConstellationScreen = ({ onSelectJob }) => {
       <div style={{ display:'flex', gap: 12, justifyContent:'center', marginBottom: 24, flexWrap:'wrap' }}>
         {[
           { id:'all',   label: `Tous (${JOBS.length})`, color: C.fg },
-          { id:'t1',    label: 'Titre 1 — Dev / IA', color: C.t1 },
-          { id:'t2',    label: 'Titre 2 — Sys / Sécu', color: C.t2 },
+          { id:'t1',    label: 'IA / Data', color: C.t1 },
+          { id:'t2',    label: 'CyberSecu', color: C.t2 },
           { id:'trans', label: 'Transverses',       color: C.trans }
         ].map(f => (
           <button
@@ -1410,8 +1410,8 @@ const GridScreen = ({ onSelectJob }) => {
           <div style={{ display:'flex', gap: 8, flexWrap:'wrap' }}>
             {[
               { id:'all', label:'Tous titres', color: C.fg },
-              { id:'t1', label:'Titre 1', color: C.t1 },
-              { id:'t2', label:'Titre 2', color: C.t2 },
+              { id:'t1', label:'IA/Data', color: C.t1 },
+              { id:'t2', label:'CyberSecu', color: C.t2 },
               { id:'trans', label:'Transverses', color: C.trans }
             ].map(f => (
               <button key={f.id} onClick={() => setTitle(f.id)}
@@ -2232,10 +2232,10 @@ const RecognitionScreen = () => {
           background: `linear-gradient(120deg, ${C.t1}, ${C.trans})`,
           WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent', backgroundClip:'text'
         }}>
-          Un diplôme reconnu en Europe
+          Votre Bac+5 reconnu en Europe
         </h1>
         <p style={{ fontSize: 22, color: C.fgDim, marginTop: 8 }}>
-          Ouvrez-vous les portes du marché européen du Master au niveau 7.
+          Ouvrez-vous les portes du marché européen au niveau Master (Bac+5).
         </p>
       </div>
 
@@ -2403,7 +2403,7 @@ const App = () => {
           fontSize: 13, color: C.muted, textAlign:'center',
           fontFamily: FONT
         }}>
-          Galaxia Métiers IT · Bac+5 RNCP Niveau 7 · 27 métiers · Sources : APEC 2024, Syntec 2024, Glassdoor 2024-2025, Robert Half 2025.
+          Galaxia Métiers IT · Bac+5 · RNCP N7 · 27 métiers · Sources : APEC 2024, Syntec 2024, Glassdoor 2024-2025, Robert Half 2025.
         </footer>
       )}
 
