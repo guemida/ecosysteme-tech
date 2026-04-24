@@ -2510,23 +2510,34 @@ const IntroModal = ({ onClose }) => {
             <X size={20}/>
           </button>
 
-          {/* Brand mark chip */}
+          {/* School logo + Galaxia chip */}
           <div style={{ textAlign: 'center', marginBottom: 28 }}>
+            <img
+              src="./logo.svg"
+              alt="École IT"
+              style={{ height: 48, width: 'auto', marginBottom: 20, display:'inline-block' }}
+            />
             <div style={{
-              display: 'inline-flex', alignItems: 'center', gap: 10,
-              padding: '7px 14px',
-              background: `${PINK}15`,
-              border: `1px solid ${PINK}66`,
-              borderRadius: 6,
+              display: 'flex', alignItems: 'center', justifyContent:'center', gap: 10,
               marginBottom: 22
             }}>
-              <Sparkles size={14} color={PINK}/>
-              <span style={{
-                fontSize: 13, fontWeight: 800, color: PINK,
-                letterSpacing: '0.22em', textTransform: 'uppercase'
+              <div style={{ height: 1, width: 40, background: NAVY_BORDER }}/>
+              <div style={{
+                display: 'inline-flex', alignItems: 'center', gap: 10,
+                padding: '7px 14px',
+                background: `${PINK}15`,
+                border: `1px solid ${PINK}66`,
+                borderRadius: 6
               }}>
-                Galaxia Métiers IT
-              </span>
+                <Sparkles size={14} color={PINK}/>
+                <span style={{
+                  fontSize: 13, fontWeight: 800, color: PINK,
+                  letterSpacing: '0.22em', textTransform: 'uppercase'
+                }}>
+                  Galaxia Métiers IT
+                </span>
+              </div>
+              <div style={{ height: 1, width: 40, background: NAVY_BORDER }}/>
             </div>
 
             {/* Headline — solid white, pink underline on key word */}
