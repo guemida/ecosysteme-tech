@@ -16,19 +16,21 @@ import {
    ============================================================ */
 
 const C = {
-  bg: '#0F172A',
-  bgDeep: '#020617',
-  bgElev: '#1E293B',
+  bg: '#0A0E1F',
+  bgDeep: '#050814',
+  bgElev: '#121734',
   fg: '#F8FAFC',
   fgDim: '#CBD5E1',
-  muted: '#94A3B8',
-  border: '#334155',
+  muted: '#8890B0',
+  border: '#1E2750',
   t1: '#3B82F6',
   t2: '#F97316',
   trans: '#8B5CF6',
   success: '#10B981',
   warn: '#F59E0B',
-  danger: '#EF4444'
+  danger: '#EF4444',
+  pink: '#FF2891',
+  cyan: '#00D4FF'
 };
 
 const TITLES = [
@@ -759,25 +761,24 @@ const Card = ({ children, style, onClick, active, hover=true }) => (
   <div
     onClick={onClick}
     style={{
-      background: active ? 'rgba(59,130,246,0.08)' : 'rgba(30,41,59,0.7)',
-      backdropFilter: 'blur(10px)',
-      border: `1px solid ${active ? C.t1 : C.border}`,
-      borderRadius: 16,
+      background: active ? `${C.pink}10` : C.bgElev,
+      border: `1px solid ${active ? C.pink : C.border}`,
+      borderRadius: 10,
       padding: 24,
-      transition: 'all 200ms ease',
+      transition: 'all 180ms ease',
       cursor: onClick ? 'pointer' : 'default',
       ...style
     }}
     onMouseEnter={(e) => {
       if (!hover || !onClick) return;
       e.currentTarget.style.transform = 'translateY(-2px)';
-      e.currentTarget.style.borderColor = C.t1;
-      e.currentTarget.style.boxShadow = '0 12px 32px rgba(59,130,246,0.15)';
+      e.currentTarget.style.borderColor = C.pink;
+      e.currentTarget.style.boxShadow = `0 10px 28px ${C.pink}26`;
     }}
     onMouseLeave={(e) => {
       if (!hover || !onClick) return;
       e.currentTarget.style.transform = 'translateY(0)';
-      e.currentTarget.style.borderColor = active ? C.t1 : C.border;
+      e.currentTarget.style.borderColor = active ? C.pink : C.border;
       e.currentTarget.style.boxShadow = 'none';
     }}
   >{children}</div>
@@ -874,7 +875,7 @@ const Stat = ({ value, label, color=C.t1, icon:Icon }) => (
   <div style={{
     display: 'flex', flexDirection: 'column', alignItems: 'center',
     padding: '18px 24px',
-    background: 'rgba(15,23,42,0.6)',
+    background: C.bgDeep,
     border: `1px solid ${color}33`,
     borderRadius: 14, minWidth: 180
   }}>
@@ -986,8 +987,7 @@ const SCREENS = [
 const Navbar = ({ current, onChange, onTogglePresent, presentMode }) => (
   <nav style={{
     position: 'fixed', top: 0, left: 0, right: 0, zIndex: 100,
-    background: 'rgba(2,6,23,0.85)',
-    backdropFilter: 'blur(16px)',
+    background: C.bgDeep,
     borderBottom: `1px solid ${C.border}`,
     padding: '12px 32px',
     display: 'flex', alignItems: 'center', justifyContent: 'space-between',
@@ -996,17 +996,9 @@ const Navbar = ({ current, onChange, onTogglePresent, presentMode }) => (
     transition: 'transform 250ms ease'
   }}>
     <div style={{ display:'flex', alignItems:'center', gap: 16 }}>
-      <div style={{
-        width: 42, height: 42, borderRadius: 12,
-        background: `linear-gradient(135deg, ${C.t1}, ${C.trans})`,
-        display:'flex', alignItems:'center', justifyContent:'center',
-        boxShadow: '0 4px 16px rgba(139,92,246,0.4)'
-      }}>
-        <Sparkles size={22} color="#fff" />
-      </div>
-      <div style={{ lineHeight: 1.2 }}>
-        <div style={{ fontSize: 18, fontWeight: 700, color: C.fg }}>Galaxia Métiers IT</div>
-        <div style={{ fontSize: 13, color: C.muted }}>27 métiers · Bac+5 · RNCP N7</div>
+      <img src="./logo.svg" alt="École IT" style={{ height: 36, width:'auto', display:'block' }}/>
+      <div style={{ lineHeight: 1.2, paddingLeft: 14, borderLeft: `1px solid ${C.border}` }}>
+        <div style={{ fontSize: 14, color: C.muted, fontWeight: 500 }}>27 métiers · Bac+5 · RNCP N7</div>
       </div>
     </div>
 
@@ -1019,26 +1011,29 @@ const Navbar = ({ current, onChange, onTogglePresent, presentMode }) => (
             key={s.id}
             onClick={() => onChange(s.id)}
             style={{
+              position:'relative',
               display:'flex', alignItems:'center', gap: 8,
-              padding: '10px 18px',
-              borderRadius: 10,
-              background: active ? `${C.t1}26` : 'transparent',
+              padding: '10px 16px',
+              borderRadius: 8,
+              background: 'transparent',
               color: active ? C.fg : C.fgDim,
-              border: `1px solid ${active ? C.t1+'88' : 'transparent'}`,
+              border: 'none',
+              borderBottom: `2px solid ${active ? C.pink : 'transparent'}`,
               cursor: 'pointer',
               fontSize: 16,
               fontWeight: active ? 700 : 500,
               fontFamily: FONT,
               transition: 'all 150ms'
             }}
-            onMouseEnter={(e) => { if (!active) { e.currentTarget.style.background = 'rgba(59,130,246,0.1)'; e.currentTarget.style.color = C.fg; } }}
-            onMouseLeave={(e) => { if (!active) { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = C.fgDim; } }}
+            onMouseEnter={(e) => { if (!active) { e.currentTarget.style.color = C.fg; } }}
+            onMouseLeave={(e) => { if (!active) { e.currentTarget.style.color = C.fgDim; } }}
           >
             <Icon size={18} />
             <span>{s.label}</span>
             <span style={{
-              fontSize: 12, padding: '2px 6px', borderRadius: 6,
-              background: 'rgba(148,163,184,0.15)', color: C.muted, fontWeight: 600
+              fontSize: 12, padding: '2px 6px', borderRadius: 4,
+              background: active ? `${C.pink}22` : `${C.border}`,
+              color: active ? C.pink : C.muted, fontWeight: 700
             }}>{s.shortcut}</span>
           </button>
         );
@@ -1050,15 +1045,17 @@ const Navbar = ({ current, onChange, onTogglePresent, presentMode }) => (
       title="Mode présentation (F11 ou Ctrl+F)"
       style={{
         display:'flex', alignItems:'center', gap: 8,
-        padding: '10px 16px', borderRadius: 10,
-        background: 'rgba(139,92,246,0.2)',
-        color: C.trans,
-        border: `1px solid ${C.trans}66`,
-        cursor:'pointer', fontSize: 15, fontWeight: 600,
-        fontFamily: FONT
+        padding: '10px 18px', borderRadius: 8,
+        background: C.pink,
+        color: '#fff',
+        border: 'none',
+        cursor:'pointer', fontSize: 14, fontWeight: 800,
+        fontFamily: FONT,
+        letterSpacing: '0.06em', textTransform: 'uppercase',
+        boxShadow: `0 4px 14px ${C.pink}55`
       }}
     >
-      <Presentation size={18} />
+      <Presentation size={16} />
       Présentation
     </button>
   </nav>
@@ -1071,7 +1068,7 @@ const PresentModeToggle = ({ show, onClick }) => (
     style={{
       position: 'fixed', top: 16, right: 16, zIndex: 200,
       padding: 10, borderRadius: 10,
-      background: 'rgba(30,41,59,0.85)',
+      background: C.bgElev,
       border: `1px solid ${C.border}`,
       color: C.fg, cursor:'pointer',
       opacity: show ? 0.5 : 0,
@@ -1269,15 +1266,12 @@ const ConstellationScreen = ({ onSelectJob }) => {
       {/* Header */}
       <div style={{ textAlign:'center', marginBottom: 28 }}>
         <h1 style={{
-          fontSize: 44, fontWeight: 800, margin: 0, letterSpacing: '-0.02em',
-          background: `linear-gradient(120deg, ${C.t1}, ${C.trans}, ${C.t2})`,
-          WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
-          backgroundClip: 'text'
+          fontSize: 44, fontWeight: 900, margin: 0, letterSpacing: '-0.02em', color: C.fg, lineHeight: 1.15
         }}>
-          27 métiers accessibles avec votre Bac+5
+          <span style={{ borderBottom: `4px solid ${C.pink}`, paddingBottom: 3 }}>27 métiers</span>{' '}accessibles avec votre Bac+5
         </h1>
-        <p style={{ fontSize: 22, color: C.fgDim, marginTop: 10, fontWeight: 500 }}>
-          2 spécialisations · Bac+5 · 300 ECTS · Reconnu dans toute l'Europe
+        <p style={{ fontSize: 22, color: C.fgDim, marginTop: 14, fontWeight: 500 }}>
+          2 spécialisations · <strong style={{ color: C.fg, borderBottom: `2px solid ${C.cyan}` }}>Bac+5</strong> · 300 ECTS · Reconnu dans toute l'Europe
         </p>
       </div>
 
@@ -1285,8 +1279,8 @@ const ConstellationScreen = ({ onSelectJob }) => {
       <div ref={wrapRef} style={{ position: 'relative', marginBottom: 24 }}>
         <div style={{
           position:'absolute', top: 16, left: 16, zIndex: 10,
-          background: 'rgba(2,6,23,0.7)', backdropFilter: 'blur(10px)',
-          border: `1px solid ${C.border}`, borderRadius: 12, padding: '14px 18px'
+          background: C.bgElev,
+          border: `1px solid ${C.border}`, borderRadius: 8, padding: '14px 18px'
         }}>
           <div style={{ fontSize: 16, color: C.fgDim, marginBottom: 10, fontWeight: 700 }}>Familles métier</div>
           <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap: '6px 18px' }}>
@@ -1304,9 +1298,9 @@ const ConstellationScreen = ({ onSelectJob }) => {
           style={{
             position:'absolute', top: 16, right: 16, zIndex: 10,
             padding: '8px 14px', borderRadius: 8,
-            background: 'rgba(2,6,23,0.7)', backdropFilter:'blur(10px)',
+            background: C.bgElev,
             border: `1px solid ${C.border}`, color: C.fg, cursor:'pointer',
-            fontSize: 14, fontWeight: 600, fontFamily: FONT
+            fontSize: 14, fontWeight: 700, fontFamily: FONT
           }}
         >
           {paused ? '▶ Reprendre' : '⏸ Pause'}
@@ -1378,10 +1372,10 @@ const GridScreen = ({ onSelectJob }) => {
   return (
     <div style={{ padding: '32px 48px', fontFamily: FONT, minHeight:'100vh' }}>
       <div style={{ marginBottom: 28 }}>
-        <h1 style={{ fontSize: 38, fontWeight: 800, margin: 0, color: C.fg, letterSpacing:'-0.02em' }}>
-          Les 27 métiers en un coup d'œil
+        <h1 style={{ fontSize: 38, fontWeight: 900, margin: 0, color: C.fg, letterSpacing:'-0.02em' }}>
+          Les <span style={{ borderBottom: `4px solid ${C.pink}`, paddingBottom: 2 }}>27 métiers</span> en un coup d'œil
         </h1>
-        <p style={{ fontSize: 19, color: C.fgDim, marginTop: 6 }}>
+        <p style={{ fontSize: 19, color: C.fgDim, marginTop: 10 }}>
           Filtrez pour explorer le spectre d'opportunités.
         </p>
       </div>
@@ -1398,7 +1392,7 @@ const GridScreen = ({ onSelectJob }) => {
               placeholder="Rechercher un métier, synonyme FR/EN…"
               style={{
                 width: '100%', padding: '12px 14px 12px 42px',
-                background: 'rgba(15,23,42,0.6)',
+                background: C.bgDeep,
                 border: `1px solid ${C.border}`,
                 borderRadius: 10, color: C.fg,
                 fontSize: 17, fontFamily: FONT, outline: 'none'
@@ -1498,12 +1492,7 @@ const JobCard = ({ job, onClick }) => {
   const FamIcon = fam.icon;
   const tColor = jobTitleColor(job);
   return (
-    <Card onClick={onClick} style={{ position:'relative', overflow:'hidden' }}>
-      {/* color accent */}
-      <div style={{
-        position:'absolute', top:0, left:0, right:0, height: 4,
-        background: `linear-gradient(90deg, ${fam.color}, ${tColor})`
-      }}/>
+    <Card onClick={onClick} style={{ position:'relative', overflow:'hidden', borderLeft: `4px solid ${tColor}` }}>
       <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', marginBottom: 14, gap: 8 }}>
         <div style={{ display:'flex', alignItems:'center', gap: 10 }}>
           <div style={{
@@ -1534,7 +1523,7 @@ const JobCard = ({ job, onClick }) => {
       </div>
 
       <div style={{
-        padding: 16, background: 'rgba(15,23,42,0.6)', borderRadius: 12,
+        padding: 16, background: C.bgDeep, borderRadius: 12,
         display:'flex', alignItems:'baseline', justifyContent:'space-between', gap: 12
       }}>
         <div>
@@ -1582,7 +1571,7 @@ const JobDetailScreen = ({ jobId, onSelectJob, onNavigate }) => {
           onClick={() => onNavigate(-1)}
           style={{
             display:'flex', alignItems:'center', gap: 8,
-            padding:'10px 18px', background: 'rgba(30,41,59,0.7)',
+            padding:'10px 18px', background: C.bgElev,
             border: `1px solid ${C.border}`, borderRadius: 10,
             color: C.fg, cursor:'pointer', fontSize: 16, fontWeight: 600, fontFamily: FONT
           }}
@@ -1612,7 +1601,7 @@ const JobDetailScreen = ({ jobId, onSelectJob, onNavigate }) => {
           onClick={() => onNavigate(1)}
           style={{
             display:'flex', alignItems:'center', gap: 8,
-            padding:'10px 18px', background: 'rgba(30,41,59,0.7)',
+            padding:'10px 18px', background: C.bgElev,
             border: `1px solid ${C.border}`, borderRadius: 10,
             color: C.fg, cursor:'pointer', fontSize: 16, fontWeight: 600, fontFamily: FONT
           }}
@@ -1907,7 +1896,7 @@ const TabCareer = ({ job, onSelectJob }) => {
                 <div key={i} style={{
                   display:'grid', gridTemplateColumns:'56px 1fr auto',
                   gap: 14, padding: 16, alignItems:'center',
-                  background: 'rgba(15,23,42,0.6)', borderRadius: 12,
+                  background: C.bgDeep, borderRadius: 12,
                   border: `1px solid ${C.border}`
                 }}>
                   <div style={{ fontSize: 36 }}>{c.flag}</div>
@@ -1977,7 +1966,7 @@ const MatrixScreen = ({ onSelectJob, preselectedCourseId }) => {
       <button onClick={() => setSelectedCourse(c.id)}
         style={{
           width: '100%', textAlign:'left', padding:'12px 14px',
-          background: active ? `${color}33` : 'rgba(30,41,59,0.5)',
+          background: active ? `${color}33` : C.bgElev,
           border: `1px solid ${active ? color : C.border}`,
           borderRadius: 10, color: C.fg, cursor:'pointer',
           marginBottom: 6, fontFamily: FONT,
@@ -2007,10 +1996,10 @@ const MatrixScreen = ({ onSelectJob, preselectedCourseId }) => {
   return (
     <div style={{ padding:'32px 48px', fontFamily: FONT, minHeight:'100vh' }}>
       <div style={{ marginBottom: 24 }}>
-        <h1 style={{ fontSize: 38, fontWeight: 800, margin: 0, color: C.fg, letterSpacing:'-0.02em' }}>
-          D'une matière aux métiers
+        <h1 style={{ fontSize: 38, fontWeight: 900, margin: 0, color: C.fg, letterSpacing:'-0.02em' }}>
+          D'une <span style={{ borderBottom: `4px solid ${C.pink}`, paddingBottom: 2 }}>matière</span> aux métiers
         </h1>
-        <p style={{ fontSize: 19, color: C.fgDim, marginTop: 6 }}>
+        <p style={{ fontSize: 19, color: C.fgDim, marginTop: 10 }}>
           Cliquez sur une matière pour voir à quels métiers elle prépare.
         </p>
       </div>
@@ -2046,7 +2035,7 @@ const MatrixScreen = ({ onSelectJob, preselectedCourseId }) => {
             Métiers qui exploitent <span style={{ color: C.t1 }}>{selected?.id}</span>
           </SectionTitle>
 
-          <div style={{ padding: 16, background: 'rgba(15,23,42,0.6)', borderRadius: 12, marginBottom: 20 }}>
+          <div style={{ padding: 16, background: C.bgDeep, borderRadius: 12, marginBottom: 20 }}>
             <div style={{ fontSize: 18, fontWeight: 700, color: C.fg }}>{selected?.name}</div>
             <div style={{ fontSize: 14, color: C.muted, marginTop: 4 }}>
               {selected?.year} · {selected?.unit} · {selected?.days > 0 ? selected?.days+' jours' : 'transversal'}
@@ -2121,10 +2110,10 @@ const CompareScreen = () => {
   return (
     <div style={{ padding:'32px 48px', fontFamily: FONT, minHeight:'100vh' }}>
       <div style={{ marginBottom: 24 }}>
-        <h1 style={{ fontSize: 38, fontWeight: 800, margin: 0, color: C.fg, letterSpacing:'-0.02em' }}>
-          Comparer 2 à 3 métiers
+        <h1 style={{ fontSize: 38, fontWeight: 900, margin: 0, color: C.fg, letterSpacing:'-0.02em' }}>
+          <span style={{ borderBottom: `4px solid ${C.pink}`, paddingBottom: 2 }}>Comparer</span> 2 à 3 métiers
         </h1>
-        <p style={{ fontSize: 19, color: C.fgDim, marginTop: 6 }}>
+        <p style={{ fontSize: 19, color: C.fgDim, marginTop: 10 }}>
           Sélectionnez des métiers pour les comparer côte à côte.
         </p>
       </div>
@@ -2138,7 +2127,7 @@ const CompareScreen = () => {
             }}
             style={{
               padding: '14px 16px', borderRadius: 12,
-              background: 'rgba(15,23,42,0.8)', color: C.fg,
+              background: C.bgDeep, color: C.fg,
               border: `1px solid ${C.border}`, fontSize: 17, fontWeight: 600,
               fontFamily: FONT, outline:'none', cursor:'pointer'
             }}>
@@ -2167,7 +2156,7 @@ const CompareScreen = () => {
               </div>
 
               {/* Salary */}
-              <div style={{ padding: 14, background: 'rgba(15,23,42,0.6)', borderRadius: 12 }}>
+              <div style={{ padding: 14, background: C.bgDeep, borderRadius: 12 }}>
                 <div style={{ fontSize: 14, color: C.muted, fontWeight: 600, marginBottom: 10 }}>Rémunération</div>
                 {[
                   { k:'junior', label:'Junior', color: '#60A5FA' },
@@ -2228,11 +2217,9 @@ const RecognitionScreen = () => {
     <div style={{ padding:'32px 48px', fontFamily: FONT, minHeight:'100vh' }}>
       <div style={{ textAlign:'center', marginBottom: 40 }}>
         <h1 style={{
-          fontSize: 42, fontWeight: 800, margin: 0, letterSpacing:'-0.02em',
-          background: `linear-gradient(120deg, ${C.t1}, ${C.trans})`,
-          WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent', backgroundClip:'text'
+          fontSize: 42, fontWeight: 900, margin: 0, letterSpacing:'-0.02em', color: C.fg
         }}>
-          Votre Bac+5 reconnu en Europe
+          Votre <span style={{ borderBottom: `4px solid ${C.pink}`, paddingBottom: 3 }}>Bac+5</span> reconnu en Europe
         </h1>
         <p style={{ fontSize: 22, color: C.fgDim, marginTop: 8 }}>
           Ouvrez-vous les portes du marché européen au niveau Master (Bac+5).
@@ -2390,7 +2377,7 @@ const RecognitionScreen = () => {
         {credibility.map((c, i) => (
           <div key={i} style={{
             padding: '12px 22px',
-            background: 'rgba(30,41,59,0.7)',
+            background: C.bgElev,
             border: `1px solid ${C.border}`,
             borderRadius: 999,
             fontSize: 17, fontWeight: 700, color: C.fg,
@@ -2510,35 +2497,13 @@ const IntroModal = ({ onClose }) => {
             <X size={20}/>
           </button>
 
-          {/* School logo + Galaxia chip */}
+          {/* School logo */}
           <div style={{ textAlign: 'center', marginBottom: 28 }}>
             <img
               src="./logo.svg"
               alt="École IT"
-              style={{ height: 48, width: 'auto', marginBottom: 20, display:'inline-block' }}
+              style={{ height: 60, width: 'auto', marginBottom: 22, display:'inline-block' }}
             />
-            <div style={{
-              display: 'flex', alignItems: 'center', justifyContent:'center', gap: 10,
-              marginBottom: 22
-            }}>
-              <div style={{ height: 1, width: 40, background: NAVY_BORDER }}/>
-              <div style={{
-                display: 'inline-flex', alignItems: 'center', gap: 10,
-                padding: '7px 14px',
-                background: `${PINK}15`,
-                border: `1px solid ${PINK}66`,
-                borderRadius: 6
-              }}>
-                <Sparkles size={14} color={PINK}/>
-                <span style={{
-                  fontSize: 13, fontWeight: 800, color: PINK,
-                  letterSpacing: '0.22em', textTransform: 'uppercase'
-                }}>
-                  Galaxia Métiers IT
-                </span>
-              </div>
-              <div style={{ height: 1, width: 40, background: NAVY_BORDER }}/>
-            </div>
 
             {/* Headline — solid white, pink underline on key word */}
             <h1 style={{
@@ -2721,9 +2686,9 @@ const App = () => {
   return (
     <div style={{
       minHeight: '100vh',
-      background: `radial-gradient(ellipse at 20% 0%, rgba(59,130,246,0.12), transparent 50%),
-                   radial-gradient(ellipse at 80% 100%, rgba(139,92,246,0.10), transparent 50%),
-                   linear-gradient(180deg, ${C.bgDeep}, ${C.bg})`,
+      background: `radial-gradient(ellipse at 10% 0%, ${C.pink}0D, transparent 55%),
+                   radial-gradient(ellipse at 90% 100%, ${C.cyan}0D, transparent 55%),
+                   ${C.bgDeep}`,
       color: C.fg,
       paddingTop: presentMode ? 0 : 74
     }}>
@@ -2755,7 +2720,7 @@ const App = () => {
           fontSize: 13, color: C.muted, textAlign:'center',
           fontFamily: FONT
         }}>
-          Galaxia Métiers IT · Bac+5 · RNCP N7 · 27 métiers · Sources : APEC 2024, Syntec 2024, Glassdoor 2024-2025, Robert Half 2025.
+          École IT · 27 métiers · Bac+5 · RNCP N7 · Sources : APEC 2024, Syntec 2024, Glassdoor 2024-2025, Robert Half 2025.
         </footer>
       )}
 
