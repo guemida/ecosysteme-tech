@@ -1335,7 +1335,7 @@ const ConstellationScreen = ({ onSelectJob }) => {
         <Stat icon={Flame}    value={STATS.penurie}     label="métiers en pénurie" color={C.danger} />
         <Stat icon={Euro}     value={`${STATS.avgSenior}k€`} label="salaire senior moyen" color={C.success} />
         <Stat icon={GraduationCap} value={STATS.ects}  label="crédits ECTS"       color={C.t1} />
-        <Stat icon={Globe}    value={`${STATS.euCountries}+`} label="pays de mobilité"   color={C.trans} />
+        <Stat icon={Shield}   value="424k" label="postes cyber à pourvoir en Europe" color={C.pink} />
       </div>
     </div>
   );
@@ -2553,6 +2553,39 @@ const HorizonScreen = () => {
           })}
         </div>
       </div>
+
+      {/* Le marché européen — le gap */}
+      <Card hover={false} style={{ maxWidth: 1080, margin: '0 auto 28px auto' }}>
+        <SectionTitle icon={Flame} color={C.danger}>Le marché européen — le gap</SectionTitle>
+        <div style={{ display:'grid', gridTemplateColumns:'repeat(2,1fr)', gap: 14 }}>
+          {[
+            { big:'424 k',     small:'postes cyber manquants en Europe',              src:'ISC2 Workforce Study 2024', accent:C.pink },
+            { big:'+40 %/an',  small:'croissance des rôles IA d\'ici 2030',           src:'WEF Future of Jobs 2024',   accent:C.cyan },
+            { big:'~1 M/an',   small:'postes ICT à créer pour atteindre 20 M en 2030', src:'Commission UE · Digital Decade', accent:C.t1 },
+            { big:'12 M',      small:'transitions professionnelles en Europe d\'ici 2030', src:'McKinsey Future of Work', accent:C.trans }
+          ].map((p, i) => (
+            <div key={i} style={{
+              padding: 20, borderRadius: 10,
+              background: C.bgDeep,
+              border: `1px solid ${C.border}`,
+              borderLeft: `4px solid ${p.accent}`
+            }}>
+              <div style={{ fontSize: 36, fontWeight: 900, color: p.accent, letterSpacing:'-0.02em', lineHeight: 1 }}>{p.big}</div>
+              <div style={{ fontSize: 17, color: C.fg, marginTop: 10, fontWeight: 600, lineHeight: 1.35 }}>{p.small}</div>
+              <div style={{ fontSize: 12, color: C.muted, marginTop: 8, fontStyle:'italic' }}>Source : {p.src}</div>
+            </div>
+          ))}
+        </div>
+        <div style={{
+          marginTop: 18, padding: 16,
+          background: `${C.pink}12`, borderRadius: 8,
+          borderLeft: `3px solid ${C.pink}`
+        }}>
+          <div style={{ fontSize: 17, color: C.fg, lineHeight: 1.55 }}>
+            Sur <strong style={{ color: C.pink }}>10 ans (2026-2036)</strong>, les besoins en cyber et IA sont <strong style={{ color: C.pink }}>structurels</strong> : la démographie et la génération actuelle de formations ne les couvriront pas. Votre Bac+5 s'inscrit dans cette vague.
+          </div>
+        </div>
+      </Card>
 
       {/* Afrique */}
       <Card hover={false} style={{ maxWidth: 1080, margin: '0 auto 28px auto' }}>
