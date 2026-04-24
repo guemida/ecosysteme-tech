@@ -2426,20 +2426,28 @@ const IntroModal = ({ onClose }) => {
     return () => window.removeEventListener('keydown', onKey);
   }, [onClose]);
 
+  // École IT–inspired neon accents on dark navy
+  const PINK = '#FF2891';
+  const CYAN = '#00D4FF';
+  const NAVY_DEEP = '#0A0E1F';
+  const NAVY_CARD = '#121734';
+  const NAVY_BORDER = '#1E2750';
+  const MUTED = '#8890B0';
+
   const stats = [
-    { value: '27',     label: 'métiers',         color: C.t1,      icon: Briefcase },
-    { value: 'Bac+5',  label: 'RNCP Niveau 7',   color: C.trans,   icon: GraduationCap },
-    { value: '77k€',   label: 'salaire senior moyen', color: C.success, icon: Euro },
-    { value: '49',     label: 'pays reconnus',   color: C.t2,      icon: Globe }
+    { value: '27',     label: 'métiers',              accent: PINK, icon: Briefcase },
+    { value: 'Bac+5',  label: 'RNCP Niveau 7',        accent: CYAN, icon: GraduationCap },
+    { value: '77k€',   label: 'salaire senior moyen', accent: PINK, icon: Euro },
+    { value: '49',     label: 'pays reconnus',        accent: CYAN, icon: Globe }
   ];
 
   const screens = [
-    { icon: Sparkles,   title: 'Constellation',       desc: "27 métiers en un coup d'œil",         color: C.t1 },
-    { icon: LayoutGrid, title: 'Grille',              desc: 'Filtrer par salaire, tension, famille', color: C.trans },
-    { icon: User,       title: 'Fiche métier',        desc: 'Parcours, compétences, évolution',     color: C.t2 },
-    { icon: BookOpen,   title: 'Matière → Métiers',   desc: 'Comment les cours préparent chaque métier', color: '#06B6D4' },
-    { icon: GitCompare, title: 'Comparaison',         desc: '2-3 métiers côte à côte',              color: '#EC4899' },
-    { icon: Award,      title: 'Reconnaissance',      desc: 'Votre Bac+5 reconnu en Europe',        color: C.success }
+    { icon: Sparkles,   title: 'Constellation',       desc: "27 métiers en un coup d'œil",               accent: PINK },
+    { icon: LayoutGrid, title: 'Grille',              desc: 'Filtrer par salaire, tension, famille',     accent: CYAN },
+    { icon: User,       title: 'Fiche métier',        desc: 'Parcours, compétences, évolution',          accent: PINK },
+    { icon: BookOpen,   title: 'Matière → Métiers',   desc: 'Comment les cours préparent chaque métier', accent: CYAN },
+    { icon: GitCompare, title: 'Comparaison',         desc: '2-3 métiers côte à côte',                   accent: PINK },
+    { icon: Award,      title: 'Reconnaissance',      desc: 'Votre Bac+5 reconnu en Europe',             accent: CYAN }
   ];
 
   return (
@@ -2447,8 +2455,8 @@ const IntroModal = ({ onClose }) => {
       onClick={onClose}
       style={{
         position: 'fixed', inset: 0, zIndex: 500,
-        background: 'rgba(2,6,23,0.78)',
-        backdropFilter: 'blur(20px)',
+        background: 'rgba(2,6,23,0.88)',
+        backdropFilter: 'blur(14px)',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
         padding: 24,
         animation: 'fadeIn 350ms ease',
@@ -2458,151 +2466,195 @@ const IntroModal = ({ onClose }) => {
       <div
         onClick={(e) => e.stopPropagation()}
         style={{
-          maxWidth: 940, width: '100%',
+          maxWidth: 960, width: '100%',
           maxHeight: '92vh', overflowY: 'auto',
-          background: `linear-gradient(160deg, rgba(30,41,59,0.95), rgba(15,23,42,0.98))`,
-          border: `1px solid ${C.border}`,
-          borderRadius: 24,
-          padding: '48px 48px 40px 48px',
+          background: NAVY_DEEP,
+          border: `1px solid ${NAVY_BORDER}`,
+          borderRadius: 12,
           position: 'relative',
-          boxShadow: `0 24px 80px rgba(2,6,23,0.9), 0 0 120px ${C.trans}33`
+          boxShadow: '0 32px 100px rgba(0,0,0,0.7)'
         }}
       >
-        {/* Close button */}
-        <button
-          onClick={onClose}
-          title="Fermer (Échap)"
-          style={{
-            position: 'absolute', top: 20, right: 20,
-            width: 42, height: 42, borderRadius: 10,
-            background: 'rgba(148,163,184,0.12)',
-            border: `1px solid ${C.border}`,
-            color: C.fg, cursor: 'pointer',
-            display: 'flex', alignItems: 'center', justifyContent: 'center'
-          }}
-        >
-          <X size={22}/>
-        </button>
-
-        {/* Logo + Hook */}
-        <div style={{ textAlign: 'center', marginBottom: 32 }}>
-          <div style={{
-            width: 72, height: 72, borderRadius: 20,
-            background: `linear-gradient(135deg, ${C.t1}, ${C.trans}, ${C.t2})`,
-            margin: '0 auto 18px auto',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            boxShadow: `0 12px 36px ${C.trans}66`
-          }}>
-            <Sparkles size={36} color="#fff"/>
-          </div>
-
-          <div style={{
-            fontSize: 15, fontWeight: 700, color: C.trans,
-            letterSpacing: '0.14em', textTransform: 'uppercase',
-            marginBottom: 10
-          }}>
-            Galaxia Métiers IT
-          </div>
-
-          <h1 style={{
-            fontSize: 42, fontWeight: 800, margin: 0, lineHeight: 1.15,
-            letterSpacing: '-0.02em',
-            background: `linear-gradient(120deg, ${C.t1}, ${C.trans}, ${C.t2})`,
-            WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text'
-          }}>
-            27 métiers pour construire<br/>votre avenir numérique
-          </h1>
-          <p style={{ fontSize: 19, color: C.fgDim, marginTop: 14, fontWeight: 500 }}>
-            Bac+5 · Master européen · Reconnu dans <strong style={{ color: C.fg }}>49 pays</strong>
-          </p>
-        </div>
-
-        {/* Stats */}
+        {/* Top neon accent bar */}
         <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(4,1fr)',
-          gap: 12, marginBottom: 32
-        }}>
-          {stats.map((s, i) => {
-            const Icon = s.icon;
-            return (
-              <div key={i} style={{
-                padding: '18px 12px', borderRadius: 14,
-                background: `${s.color}1A`,
-                border: `1px solid ${s.color}55`,
-                textAlign: 'center'
-              }}>
-                <Icon size={20} color={s.color} style={{ marginBottom: 4 }}/>
-                <div style={{ fontSize: 30, fontWeight: 800, color: s.color, letterSpacing: '-0.02em', lineHeight: 1.1 }}>
-                  {s.value}
-                </div>
-                <div style={{ fontSize: 14, color: C.fgDim, marginTop: 6, fontWeight: 600, lineHeight: 1.3 }}>
-                  {s.label}
-                </div>
-              </div>
-            );
-          })}
-        </div>
+          height: 4,
+          background: `linear-gradient(90deg, ${PINK} 0%, ${PINK} 50%, ${CYAN} 50%, ${CYAN} 100%)`
+        }}/>
 
-        {/* What's inside */}
-        <div style={{ marginBottom: 30 }}>
-          <div style={{
-            fontSize: 14, color: C.muted, fontWeight: 700,
-            letterSpacing: '0.1em', textTransform: 'uppercase',
-            marginBottom: 14, textAlign: 'center'
-          }}>
-            Ce que vous allez explorer
+        {/* Binary pattern decoration strip */}
+        <div style={{
+          position: 'absolute', top: 4, left: 0, right: 0, height: 80,
+          background: `repeating-linear-gradient(90deg, transparent 0 22px, ${CYAN}0A 22px 24px)`,
+          maskImage: 'linear-gradient(180deg, rgba(0,0,0,0.6), transparent)',
+          WebkitMaskImage: 'linear-gradient(180deg, rgba(0,0,0,0.6), transparent)',
+          pointerEvents: 'none'
+        }}/>
+
+        <div style={{ padding: '44px 48px 40px 48px', position: 'relative' }}>
+          {/* Close button */}
+          <button
+            onClick={onClose}
+            title="Fermer (Échap)"
+            style={{
+              position: 'absolute', top: 14, right: 14,
+              width: 38, height: 38, borderRadius: 8,
+              background: 'transparent',
+              border: `1px solid ${NAVY_BORDER}`,
+              color: '#F8FAFC', cursor: 'pointer',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              transition: 'all 150ms'
+            }}
+            onMouseEnter={(e) => { e.currentTarget.style.borderColor = PINK; e.currentTarget.style.color = PINK; }}
+            onMouseLeave={(e) => { e.currentTarget.style.borderColor = NAVY_BORDER; e.currentTarget.style.color = '#F8FAFC'; }}
+          >
+            <X size={20}/>
+          </button>
+
+          {/* Brand mark chip */}
+          <div style={{ textAlign: 'center', marginBottom: 28 }}>
+            <div style={{
+              display: 'inline-flex', alignItems: 'center', gap: 10,
+              padding: '7px 14px',
+              background: `${PINK}15`,
+              border: `1px solid ${PINK}66`,
+              borderRadius: 6,
+              marginBottom: 22
+            }}>
+              <Sparkles size={14} color={PINK}/>
+              <span style={{
+                fontSize: 13, fontWeight: 800, color: PINK,
+                letterSpacing: '0.22em', textTransform: 'uppercase'
+              }}>
+                Galaxia Métiers IT
+              </span>
+            </div>
+
+            {/* Headline — solid white, pink underline on key word */}
+            <h1 style={{
+              fontSize: 44, fontWeight: 900, margin: 0, lineHeight: 1.14,
+              letterSpacing: '-0.025em', color: '#F8FAFC'
+            }}>
+              <span style={{
+                borderBottom: `4px solid ${PINK}`,
+                paddingBottom: 3
+              }}>27 métiers</span>{' '}pour construire<br/>votre avenir numérique
+            </h1>
+            <p style={{ fontSize: 19, color: MUTED, marginTop: 18, fontWeight: 500 }}>
+              Bac+5 · Master européen · Reconnu dans{' '}
+              <span style={{ color: '#F8FAFC', fontWeight: 700, borderBottom: `2px solid ${CYAN}`, paddingBottom: 1 }}>49 pays</span>
+            </p>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+
+          {/* Stats — flat cards with left accent bar */}
+          <div style={{
+            display: 'grid', gridTemplateColumns: 'repeat(4,1fr)',
+            gap: 12, marginBottom: 36
+          }}>
+            {stats.map((s, i) => {
+              const Icon = s.icon;
+              return (
+                <div key={i} style={{
+                  padding: '18px 16px 18px 18px',
+                  borderRadius: 8,
+                  background: NAVY_CARD,
+                  borderLeft: `3px solid ${s.accent}`,
+                  border: `1px solid ${NAVY_BORDER}`,
+                  borderLeftWidth: 3,
+                  borderLeftColor: s.accent
+                }}>
+                  <Icon size={18} color={s.accent} style={{ marginBottom: 8 }}/>
+                  <div style={{
+                    fontSize: 30, fontWeight: 900, color: '#F8FAFC',
+                    letterSpacing: '-0.02em', lineHeight: 1
+                  }}>
+                    {s.value}
+                  </div>
+                  <div style={{ fontSize: 14, color: MUTED, marginTop: 6, fontWeight: 500, lineHeight: 1.3 }}>
+                    {s.label}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Section heading with pink underline */}
+          <div style={{ textAlign: 'center', marginBottom: 18 }}>
+            <span style={{
+              fontSize: 13, color: PINK, fontWeight: 800,
+              letterSpacing: '0.24em', textTransform: 'uppercase',
+              borderBottom: `2px solid ${PINK}`, paddingBottom: 4
+            }}>
+              Ce que vous allez explorer
+            </span>
+          </div>
+
+          {/* Screen grid — flat cards */}
+          <div style={{
+            display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10,
+            marginBottom: 34
+          }}>
             {screens.map((s, i) => {
               const Icon = s.icon;
               return (
                 <div key={i} style={{
-                  display: 'flex', alignItems: 'center', gap: 12,
-                  padding: '12px 14px', borderRadius: 10,
-                  background: 'rgba(15,23,42,0.6)',
-                  border: `1px solid ${s.color}44`
-                }}>
+                  display: 'flex', alignItems: 'center', gap: 14,
+                  padding: '14px 16px', borderRadius: 8,
+                  background: NAVY_CARD,
+                  border: `1px solid ${NAVY_BORDER}`,
+                  transition: 'border-color 150ms'
+                }}
+                  onMouseEnter={(e) => e.currentTarget.style.borderColor = s.accent + '99'}
+                  onMouseLeave={(e) => e.currentTarget.style.borderColor = NAVY_BORDER}
+                >
                   <div style={{
-                    width: 38, height: 38, borderRadius: 9,
-                    background: `${s.color}33`, color: s.color,
+                    width: 40, height: 40, borderRadius: 8,
+                    background: `${s.accent}18`,
+                    border: `1px solid ${s.accent}55`,
+                    color: s.accent,
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                     flexShrink: 0
                   }}>
                     <Icon size={18}/>
                   </div>
                   <div style={{ minWidth: 0 }}>
-                    <div style={{ fontSize: 16, fontWeight: 700, color: C.fg }}>{s.title}</div>
-                    <div style={{ fontSize: 14, color: C.muted, lineHeight: 1.35 }}>{s.desc}</div>
+                    <div style={{ fontSize: 16, fontWeight: 700, color: '#F8FAFC' }}>{s.title}</div>
+                    <div style={{ fontSize: 14, color: MUTED, lineHeight: 1.35 }}>{s.desc}</div>
                   </div>
                 </div>
               );
             })}
           </div>
-        </div>
 
-        {/* CTA */}
-        <div style={{ textAlign: 'center' }}>
-          <button
-            onClick={onClose}
-            style={{
-              padding: '16px 40px',
-              fontSize: 19, fontWeight: 700, fontFamily: FONT,
-              background: `linear-gradient(135deg, ${C.t1}, ${C.trans})`,
-              color: '#fff', border: 'none', borderRadius: 14,
-              cursor: 'pointer',
-              display: 'inline-flex', alignItems: 'center', gap: 10,
-              boxShadow: `0 10px 32px ${C.trans}66`,
-              transition: 'transform 150ms'
-            }}
-            onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-2px)'}
-            onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
-          >
-            Commencer la présentation
-            <ChevronRight size={22}/>
-          </button>
-          <div style={{ fontSize: 14, color: C.muted, marginTop: 14 }}>
-            Raccourcis : <strong style={{ color: C.fgDim }}>1-6</strong> pour naviguer · <strong style={{ color: C.fgDim }}>←/→</strong> entre fiches · <strong style={{ color: C.fgDim }}>i</strong> pour revoir cette intro
+          {/* CTA — solid pink fill, flat */}
+          <div style={{ textAlign: 'center' }}>
+            <button
+              onClick={onClose}
+              style={{
+                padding: '17px 40px',
+                fontSize: 16, fontWeight: 800, fontFamily: FONT,
+                background: PINK,
+                color: '#fff', border: 'none', borderRadius: 8,
+                cursor: 'pointer',
+                display: 'inline-flex', alignItems: 'center', gap: 10,
+                letterSpacing: '0.06em', textTransform: 'uppercase',
+                boxShadow: `0 6px 20px ${PINK}66`,
+                transition: 'all 180ms'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'translateY(-2px)';
+                e.currentTarget.style.boxShadow = `0 10px 28px ${PINK}AA`;
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'translateY(0)';
+                e.currentTarget.style.boxShadow = `0 6px 20px ${PINK}66`;
+              }}
+            >
+              Commencer la présentation
+              <ChevronRight size={20}/>
+            </button>
+            <div style={{ fontSize: 14, color: MUTED, marginTop: 18 }}>
+              Raccourcis : <strong style={{ color: '#F8FAFC' }}>1-6</strong> naviguer · <strong style={{ color: '#F8FAFC' }}>←/→</strong> entre fiches · <strong style={{ color: '#F8FAFC' }}>i</strong> revoir l'intro
+            </div>
           </div>
         </div>
       </div>
