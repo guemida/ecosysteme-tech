@@ -8,7 +8,13 @@
   <meta name="theme-color" content="#0F172A" />
 
   <style>
-    html, body { margin: 0; padding: 0; background: #050814; color: #F8FAFC; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; }
+    @font-face {
+      font-family: 'Twemoji Country Flags';
+      unicode-range: U+1F1E6-1F1FF, U+1F3F4, U+E0062-E0063, U+E0065, U+E0067, U+E006C, U+E006E, U+E0073-E0074, U+E0077, U+E007F;
+      src: url('./TwemojiCountryFlags.woff2') format('woff2');
+      font-display: swap;
+    }
+    html, body { margin: 0; padding: 0; background: #050814; color: #F8FAFC; font-family: 'Twemoji Country Flags', 'Segoe UI', system-ui, -apple-system, 'Segoe UI Emoji', 'Apple Color Emoji', 'Noto Color Emoji', sans-serif; }
     #root { min-height: 100vh; }
     #boot {
       position: fixed; inset: 0; display: flex; align-items: center; justify-content: center;

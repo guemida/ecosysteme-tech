@@ -752,7 +752,7 @@ const jobTitleLabel = (job) => {
    UI PRIMITIVES
    ============================================================ */
 
-const FONT = `'Segoe UI', system-ui, -apple-system, sans-serif`;
+const FONT = `'Twemoji Country Flags', 'Segoe UI', system-ui, -apple-system, 'Segoe UI Emoji', 'Apple Color Emoji', 'Noto Color Emoji', sans-serif`;
 
 const Card = ({ children, style, onClick, active, hover=true }) => (
   <div
@@ -959,8 +959,8 @@ const EuropeMap = ({ highlighted = [], size = 'md' }) => {
               strokeWidth={on ? 2 : 1}
               filter={on ? 'url(#countryGlow)' : undefined}
             />
-            <text x={0} y={-2} textAnchor="middle" fontSize={22} dominantBaseline="middle">{c.flag}</text>
-            <text x={0} y={16} textAnchor="middle" fontSize={11} fontWeight="700" fill={on ? '#10B981' : '#94A3B8'}>{code}</text>
+            <text x={0} y={-2} textAnchor="middle" fontSize={22} dominantBaseline="middle" fontFamily={FONT}>{c.flag}</text>
+            <text x={0} y={16} textAnchor="middle" fontSize={11} fontWeight="700" fill={on ? '#10B981' : '#94A3B8'} fontFamily={FONT}>{code}</text>
           </g>
         );
       })}
@@ -2446,8 +2446,8 @@ const AfricaMap = ({ highlighted = [] }) => {
               strokeWidth={on ? 2 : 1}
               filter={on ? 'url(#afGlow)' : undefined}
             />
-            <text x={0} y={-2} textAnchor="middle" fontSize={22} dominantBaseline="middle">{c.flag}</text>
-            <text x={0} y={16} textAnchor="middle" fontSize={11} fontWeight="700" fill={on ? C.pink : C.muted}>{code}</text>
+            <text x={0} y={-2} textAnchor="middle" fontSize={22} dominantBaseline="middle" fontFamily={FONT}>{c.flag}</text>
+            <text x={0} y={16} textAnchor="middle" fontSize={11} fontWeight="700" fill={on ? C.pink : C.muted} fontFamily={FONT}>{code}</text>
           </g>
         );
       })}
