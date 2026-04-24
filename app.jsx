@@ -2260,6 +2260,22 @@ const RecognitionScreen = () => {
         </div>
       </div>
 
+      {/* Reinforcement badge */}
+      <div style={{ display:'flex', justifyContent:'center', marginBottom: 36 }}>
+        <div style={{
+          padding: '14px 28px',
+          background: 'rgba(139,92,246,0.14)',
+          border: `1px solid ${C.trans}66`,
+          borderRadius: 999,
+          fontSize: 19, fontWeight: 700, color: C.fg,
+          display:'flex', alignItems:'center', gap: 12,
+          boxShadow: `0 4px 20px ${C.trans}22`
+        }}>
+          <Globe size={22} color={C.trans}/>
+          Reconnu dans 30+ pays européens · Accords internationaux
+        </div>
+      </div>
+
       {/* 2x2 grid of recognitions */}
       <div style={{
         display:'grid',
@@ -2294,10 +2310,78 @@ const RecognitionScreen = () => {
       </div>
 
       {/* Europe map */}
-      <Card hover={false} style={{ maxWidth: 900, margin: '0 auto 32px auto' }}>
-        <SectionTitle icon={Globe} color={C.trans}>Mobilité directe — 11 pays</SectionTitle>
+      <Card hover={false} style={{ maxWidth: 900, margin: '0 auto 24px auto' }}>
+        <SectionTitle icon={Globe} color={C.trans}>Mobilité directe — 11 marchés cibles IT / francophonie</SectionTitle>
+        <p style={{ fontSize: 16, color: C.fgDim, margin: '0 0 16px 0', lineHeight: 1.5 }}>
+          Ces pays sont notre shortlist pour l'emploi IT et les salaires connus. Le diplôme reste reconnu dans l'ensemble de l'UE/EEE via le Processus de Bologne.
+        </p>
         <div style={{ display:'flex', justifyContent:'center' }}>
           <EuropeMap highlighted={euHighlighted} size="lg" />
+        </div>
+      </Card>
+
+      {/* Beyond Europe */}
+      <Card hover={false} style={{ maxWidth: 900, margin: '0 auto 32px auto' }}>
+        <SectionTitle icon={Globe} color={C.success}>Au-delà de l'Europe</SectionTitle>
+        <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap: 24 }}>
+          <div>
+            <div style={{ fontSize: 15, color: C.success, fontWeight: 800, letterSpacing:'0.06em', textTransform:'uppercase', marginBottom: 12 }}>
+              Accords bilatéraux France
+            </div>
+            <div style={{ display:'flex', flexDirection:'column', gap: 8 }}>
+              {[
+                { flag: '🇨🇦', name: 'Québec', note: 'Entente France-Québec' },
+                { flag: '🇲🇦', name: 'Maroc', note: 'Accord bilatéral' },
+                { flag: '🇹🇳', name: 'Tunisie', note: 'Accord bilatéral' },
+                { flag: '🇩🇿', name: 'Algérie', note: 'Accord bilatéral' },
+                { flag: '🇱🇧', name: 'Liban', note: 'Accord bilatéral' },
+                { flag: '🇸🇳', name: 'Afrique francophone', note: 'Réseau CAMES' }
+              ].map((c, i) => (
+                <div key={i} style={{
+                  display:'flex', alignItems:'center', gap: 12,
+                  padding: '10px 14px',
+                  background: 'rgba(16,185,129,0.12)',
+                  border: `1px solid ${C.success}44`,
+                  borderRadius: 10
+                }}>
+                  <span style={{ fontSize: 26 }}>{c.flag}</span>
+                  <div>
+                    <div style={{ fontSize: 17, fontWeight: 700, color: C.fg }}>{c.name}</div>
+                    <div style={{ fontSize: 14, color: C.muted }}>{c.note}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+          <div>
+            <div style={{ fontSize: 15, color: C.t1, fontWeight: 800, letterSpacing:'0.06em', textTransform:'uppercase', marginBottom: 12 }}>
+              Reconnaissance sur dossier
+            </div>
+            <div style={{ display:'flex', flexDirection:'column', gap: 8 }}>
+              {[
+                { flag: '🇺🇸', name: 'États-Unis', note: 'via WES / ECE' },
+                { flag: '🇨🇦', name: 'Canada (hors Québec)', note: 'via WES' },
+                { flag: '🇦🇺', name: 'Australie', note: 'via AEI-NOOSR' },
+                { flag: '🇦🇪', name: 'Émirats Arabes Unis', note: 'Évaluation ministérielle' },
+                { flag: '🇸🇬', name: 'Singapour', note: 'Évaluation dossier' },
+                { flag: '🌍', name: '100+ autres pays', note: 'Réseau ENIC-NARIC' }
+              ].map((c, i) => (
+                <div key={i} style={{
+                  display:'flex', alignItems:'center', gap: 12,
+                  padding: '10px 14px',
+                  background: `${C.t1}1A`,
+                  border: `1px solid ${C.t1}44`,
+                  borderRadius: 10
+                }}>
+                  <span style={{ fontSize: 26 }}>{c.flag}</span>
+                  <div>
+                    <div style={{ fontSize: 17, fontWeight: 700, color: C.fg }}>{c.name}</div>
+                    <div style={{ fontSize: 14, color: C.muted }}>{c.note}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       </Card>
 
