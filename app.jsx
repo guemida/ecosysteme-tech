@@ -8,7 +8,8 @@ import {
   Briefcase, TrendingUp, Star, Target, Zap,
   Euro, BadgeCheck, Globe, Rocket, GraduationCap,
   Flame, AlertTriangle, CheckCircle2, Laptop, Trophy, BookOpenCheck,
-  Crown, Lightbulb, Scale, Gauge, ArrowRight
+  Crown, Lightbulb, Scale, Gauge, ArrowRight,
+  Compass, Cpu, Leaf, Atom, Anchor
 } from 'lucide-react';
 
 /* ============================================================
@@ -977,7 +978,8 @@ const SCREENS = [
   { id: 'detail',        label: 'Fiche Métier',  icon: User, shortcut: '3' },
   { id: 'matrix',        label: 'Matière → Métiers', icon: BookOpen, shortcut: '4' },
   { id: 'compare',       label: 'Comparaison',   icon: GitCompare, shortcut: '5' },
-  { id: 'recognition',   label: 'Diplôme',       icon: Award, shortcut: '6' }
+  { id: 'recognition',   label: 'Diplôme',       icon: Award, shortcut: '6' },
+  { id: 'horizon',       label: 'Horizon',       icon: Compass, shortcut: '7' }
 ];
 
 const Navbar = ({ current, onChange, onTogglePresent, presentMode }) => (
@@ -2321,8 +2323,7 @@ const RecognitionScreen = () => {
                 { flag: '🇲🇦', name: 'Maroc', note: 'Accord bilatéral' },
                 { flag: '🇹🇳', name: 'Tunisie', note: 'Accord bilatéral' },
                 { flag: '🇩🇿', name: 'Algérie', note: 'Accord bilatéral' },
-                { flag: '🇱🇧', name: 'Liban', note: 'Accord bilatéral' },
-                { flag: '🇸🇳', name: 'Afrique francophone', note: 'Réseau CAMES' }
+                { flag: '🇱🇧', name: 'Liban', note: 'Accord bilatéral' }
               ].map((c, i) => (
                 <div key={i} style={{
                   display:'flex', alignItems:'center', gap: 12,
@@ -2351,7 +2352,8 @@ const RecognitionScreen = () => {
                 { flag: '🇦🇺', name: 'Australie', note: 'via AEI-NOOSR' },
                 { flag: '🇦🇪', name: 'Émirats Arabes Unis', note: 'Évaluation ministérielle' },
                 { flag: '🇸🇬', name: 'Singapour', note: 'Évaluation dossier' },
-                { flag: '🌍', name: '100+ pays', note: 'ENIC-NARIC + WES + agences d\'évaluation' }
+                { flag: '🌍', name: 'CAMES (19 pays)', note: 'Afrique francophone · procédure PRED' },
+                { flag: '🗺️', name: '100+ pays', note: 'ENIC-NARIC + WES + agences d\'évaluation' }
               ].map((c, i) => (
                 <div key={i} style={{
                   display:'flex', alignItems:'center', gap: 12,
@@ -2398,6 +2400,237 @@ const RecognitionScreen = () => {
 };
 
 /* ============================================================
+   AFRICA MAP — stylized pastilles of key IT hubs
+   ============================================================ */
+
+const AFRICA_COUNTRIES = {
+  MA: { name: 'Maroc',          flag: '🇲🇦', x: 150, y: 80,  city: 'Casablanca' },
+  DZ: { name: 'Algérie',        flag: '🇩🇿', x: 245, y: 95,  city: 'Alger' },
+  TN: { name: 'Tunisie',        flag: '🇹🇳', x: 310, y: 75,  city: 'Tunis' },
+  EG: { name: 'Égypte',         flag: '🇪🇬', x: 430, y: 130, city: 'Le Caire' },
+  SN: { name: 'Sénégal',        flag: '🇸🇳', x: 85,  y: 270, city: 'Dakar' },
+  CI: { name: 'Côte d\'Ivoire', flag: '🇨🇮', x: 175, y: 340, city: 'Abidjan' },
+  NG: { name: 'Nigeria',        flag: '🇳🇬', x: 285, y: 345, city: 'Lagos' },
+  ET: { name: 'Éthiopie',       flag: '🇪🇹', x: 455, y: 320, city: 'Addis-Abeba' },
+  KE: { name: 'Kenya',          flag: '🇰🇪', x: 460, y: 400, city: 'Nairobi' },
+  RW: { name: 'Rwanda',         flag: '🇷🇼', x: 410, y: 410, city: 'Kigali' },
+  ZA: { name: 'Afrique du Sud', flag: '🇿🇦', x: 355, y: 570, city: 'Johannesburg' },
+  CM: { name: 'Cameroun',       flag: '🇨🇲', x: 325, y: 380, city: 'Douala' }
+};
+
+const AFRICA_SHAPE = "M130,60 L250,45 L340,55 L440,90 L500,135 L520,210 L525,300 L510,380 L470,460 L420,530 L360,600 L300,620 L240,585 L200,520 L170,440 L140,360 L110,275 L85,195 L95,115 Z";
+
+const AfricaMap = ({ highlighted = [] }) => {
+  return (
+    <svg viewBox="0 0 600 680" width="100%" style={{ maxWidth: 560, display:'block' }}>
+      <defs>
+        <radialGradient id="afBg" cx="50%" cy="45%" r="55%">
+          <stop offset="0%"  stopColor={C.pink} stopOpacity="0.08" />
+          <stop offset="100%" stopColor={C.bgDeep} stopOpacity="0" />
+        </radialGradient>
+        <filter id="afGlow">
+          <feGaussianBlur stdDeviation="4" result="b" />
+          <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+      </defs>
+      <path d={AFRICA_SHAPE} fill="url(#afBg)" stroke={C.border} strokeWidth="1" strokeDasharray="4 6" opacity="0.7"/>
+      {Object.entries(AFRICA_COUNTRIES).map(([code, c]) => {
+        const on = highlighted.includes(code);
+        return (
+          <g key={code} transform={`translate(${c.x},${c.y})`}>
+            <rect
+              x={-34} y={-22} width={68} height={44}
+              rx={8}
+              fill={on ? `${C.pink}33` : `${C.bgElev}cc`}
+              stroke={on ? C.pink : C.border}
+              strokeWidth={on ? 2 : 1}
+              filter={on ? 'url(#afGlow)' : undefined}
+            />
+            <text x={0} y={-2} textAnchor="middle" fontSize={22} dominantBaseline="middle">{c.flag}</text>
+            <text x={0} y={16} textAnchor="middle" fontSize={11} fontWeight="700" fill={on ? C.pink : C.muted}>{code}</text>
+          </g>
+        );
+      })}
+    </svg>
+  );
+};
+
+/* ============================================================
+   SCREEN 7 — HORIZON (conclusion / prospective)
+   ============================================================ */
+
+const HorizonScreen = () => {
+  const forces = [
+    { icon: Atom,    title: 'Informatique quantique', desc: "Émergence de nouveaux métiers : Quantum Engineer, QML Specialist. Horizon 5-10 ans sur les cas d'usage industriels.", color: C.t1 },
+    { icon: Cpu,     title: 'IA générative mature',   desc: "Déjà dans le programme (M2IAAV). La vague continue : agents autonomes, multi-modal, AI engineering à grande échelle.", color: C.trans },
+    { icon: Leaf,    title: 'Code éco-responsable',   desc: "Transition du Python vers Go/Rust pour l'automatisation (infra, cyber). Future régulation verte possible.", color: C.success },
+    { icon: Anchor,  title: 'Clouds souverains',      desc: "France (S3NS, OVHcloud), UE (Gaia-X), Afrique (SENUM au Sénégal, Cloud Maroc). Nouvelle couche géopolitique du SI.", color: C.pink }
+  ];
+
+  const africaPoints = [
+    { big: '45 000 km', small: 'fibre (câble Meta 2Africa encercle le continent)' },
+    { big: '×2',        small: 'marché data centers d\'ici 2028' },
+    { big: '19 pays',   small: 'CAMES — équivalence via procédure PRED' },
+    { big: '100 %+',    small: 'croissance des besoins IT / cyber / data' }
+  ];
+
+  const ancre = [
+    { icon: Gauge,       title: 'Fondamentaux',      desc: 'Maths, algorithmes, réseau, sécurité — transversaux et durables' },
+    { icon: Lightbulb,   title: 'Soft skills',       desc: 'Leadership, éthique, communication : ne périment pas' },
+    { icon: BookOpenCheck, title: 'Apprendre à apprendre', desc: 'La vraie compétence qui traverse les vagues technologiques' }
+  ];
+
+  const africaHubs = ['MA','DZ','TN','EG','SN','CI','NG','KE','ZA','RW','ET','CM'];
+
+  return (
+    <div style={{ padding:'32px 48px', fontFamily: FONT, minHeight:'100vh' }}>
+      {/* Hero */}
+      <div style={{ textAlign:'center', marginBottom: 40 }}>
+        <h1 style={{ fontSize: 42, fontWeight: 900, margin: 0, color: C.fg, letterSpacing:'-0.02em', lineHeight: 1.15 }}>
+          Au-delà des 27 métiers — <span style={{ borderBottom: `4px solid ${C.pink}`, paddingBottom: 3 }}>l'horizon à 10 ans</span>
+        </h1>
+        <p style={{ fontSize: 22, color: C.fgDim, marginTop: 14, fontWeight: 500 }}>
+          Cette galaxie est une photographie d'aujourd'hui. Voici ce qui va la transformer.
+        </p>
+      </div>
+
+      {/* Photographie à 2-3 ans */}
+      <Card hover={false} style={{ maxWidth: 1080, margin: '0 auto 28px auto' }}>
+        <SectionTitle icon={Gauge} color={C.cyan}>Une photographie à 2-3 ans</SectionTitle>
+        <div style={{ display:'grid', gridTemplateColumns:'repeat(3, 1fr)', gap: 16, marginBottom: 20 }}>
+          <Stat icon={Target}  value="2-3 ans" label="horizon de pertinence stable"  color={C.t1} />
+          <Stat icon={Rocket}  value="5+ ans"  label="transformations majeures attendues" color={C.pink} />
+          <Stat icon={Gauge}   value="1×/an"   label="programme ré-aligné par l'école"    color={C.cyan} />
+        </div>
+        <div style={{
+          padding: 18, background: C.bgDeep, borderRadius: 8,
+          borderLeft: `3px solid ${C.success}`
+        }}>
+          <div style={{ fontSize: 15, fontWeight: 800, color: C.success, letterSpacing:'0.06em', textTransform:'uppercase', marginBottom: 8 }}>
+            Exemple concret
+          </div>
+          <div style={{ fontSize: 18, color: C.fg, lineHeight: 1.5 }}>
+            <strong style={{ color: C.pink }}>Python → Go</strong> pour l'automatisation infra et cyber. Go est éco-compatible, plus performant, et pourrait devenir un standard imposé demain par la réglementation verte.
+          </div>
+        </div>
+      </Card>
+
+      {/* Forces de transformation */}
+      <div style={{ maxWidth: 1080, margin: '0 auto 28px auto' }}>
+        <div style={{ textAlign:'center', marginBottom: 20 }}>
+          <span style={{
+            fontSize: 13, color: C.pink, fontWeight: 800,
+            letterSpacing: '0.22em', textTransform: 'uppercase',
+            borderBottom: `2px solid ${C.pink}`, paddingBottom: 4
+          }}>
+            Forces qui transforment les métiers IT
+          </span>
+        </div>
+        <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap: 16 }}>
+          {forces.map((f, i) => {
+            const Icon = f.icon;
+            return (
+              <div key={i} style={{
+                padding: 22, borderRadius: 10,
+                background: C.bgElev,
+                border: `1px solid ${C.border}`,
+                borderLeft: `4px solid ${f.color}`,
+                display:'flex', gap: 16, alignItems:'flex-start'
+              }}>
+                <div style={{
+                  width: 52, height: 52, borderRadius: 10, flexShrink: 0,
+                  background: `${f.color}22`, color: f.color,
+                  display:'flex', alignItems:'center', justifyContent:'center'
+                }}>
+                  <Icon size={28}/>
+                </div>
+                <div>
+                  <div style={{ fontSize: 20, fontWeight: 800, color: C.fg, marginBottom: 6 }}>{f.title}</div>
+                  <div style={{ fontSize: 16, color: C.fgDim, lineHeight: 1.5 }}>{f.desc}</div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Afrique */}
+      <Card hover={false} style={{ maxWidth: 1080, margin: '0 auto 28px auto' }}>
+        <SectionTitle icon={Globe} color={C.pink}>L'Afrique — grand terrain d'opportunité</SectionTitle>
+        <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap: 28, alignItems:'center' }}>
+          <div style={{ display:'flex', justifyContent:'center' }}>
+            <AfricaMap highlighted={africaHubs}/>
+          </div>
+          <div>
+            <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap: 14, marginBottom: 20 }}>
+              {africaPoints.map((p, i) => (
+                <div key={i} style={{
+                  padding: 16, borderRadius: 10,
+                  background: C.bgDeep,
+                  borderLeft: `3px solid ${C.pink}`
+                }}>
+                  <div style={{ fontSize: 28, fontWeight: 900, color: C.fg, letterSpacing:'-0.02em' }}>{p.big}</div>
+                  <div style={{ fontSize: 14, color: C.muted, marginTop: 6, lineHeight: 1.35 }}>{p.small}</div>
+                </div>
+              ))}
+            </div>
+            <div style={{
+              padding: 16, background: C.bgDeep, borderRadius: 8,
+              borderLeft: `3px solid ${C.cyan}`
+            }}>
+              <div style={{ fontSize: 17, color: C.fg, lineHeight: 1.55 }}>
+                L'Afrique cumule <strong style={{ color: C.pink }}>énergie renouvelable abondante</strong> (solaire, hydro, éolien), <strong style={{ color: C.pink }}>fibre massive</strong> (Google Equiano, Meta 2Africa) et <strong style={{ color: C.pink }}>forte demande IT non servie</strong> → marché porteur pour les diplômés francophones.
+              </div>
+            </div>
+          </div>
+        </div>
+      </Card>
+
+      {/* Ce qui ne change pas */}
+      <Card hover={false} style={{ maxWidth: 1080, margin: '0 auto 28px auto' }}>
+        <SectionTitle icon={Anchor} color={C.success}>Ce qui ne change pas</SectionTitle>
+        <div style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap: 14 }}>
+          {ancre.map((a, i) => {
+            const Icon = a.icon;
+            return (
+              <div key={i} style={{
+                padding: 18, borderRadius: 10,
+                background: C.bgDeep,
+                border: `1px solid ${C.border}`,
+                textAlign: 'center'
+              }}>
+                <div style={{
+                  width: 56, height: 56, borderRadius: 14,
+                  background: `${C.success}22`, color: C.success,
+                  display:'flex', alignItems:'center', justifyContent:'center',
+                  margin: '0 auto 14px auto'
+                }}>
+                  <Icon size={28}/>
+                </div>
+                <div style={{ fontSize: 19, fontWeight: 800, color: C.fg, marginBottom: 8 }}>{a.title}</div>
+                <div style={{ fontSize: 15, color: C.fgDim, lineHeight: 1.5 }}>{a.desc}</div>
+              </div>
+            );
+          })}
+        </div>
+      </Card>
+
+      {/* Closing */}
+      <div style={{ textAlign:'center', maxWidth: 900, margin: '0 auto', padding: '8px 24px 24px 24px' }}>
+        <div style={{
+          fontSize: 24, fontWeight: 800, color: C.fg, lineHeight: 1.4, letterSpacing:'-0.01em'
+        }}>
+          Votre <span style={{ borderBottom: `3px solid ${C.pink}`, paddingBottom: 2 }}>Bac+5</span> est une clé qui ouvre bien plus que les 27 portes présentées.
+        </div>
+        <div style={{ fontSize: 16, color: C.muted, marginTop: 12 }}>
+          École IT ré-aligne son programme chaque année pour que cette clé reste valide.
+        </div>
+      </div>
+    </div>
+  );
+};
+
+/* ============================================================
    INTRO MODAL — first-load overview popup
    ============================================================ */
 
@@ -2434,7 +2667,8 @@ const IntroModal = ({ onClose }) => {
     { icon: User,       title: 'Fiche métier',        desc: 'Parcours, compétences, évolution',          accent: PINK },
     { icon: BookOpen,   title: 'Matière → Métiers',   desc: 'Comment les cours préparent chaque métier', accent: CYAN },
     { icon: GitCompare, title: 'Comparaison',         desc: '2-3 métiers côte à côte',                   accent: PINK },
-    { icon: Award,      title: 'Reconnaissance',      desc: 'Votre Bac+5 reconnu en Europe',             accent: CYAN }
+    { icon: Award,      title: 'Reconnaissance',      desc: 'Votre Bac+5 reconnu en Europe',             accent: CYAN },
+    { icon: Compass,    title: 'Horizon',             desc: 'Quantique, IA, Afrique, clouds souverains', accent: PINK }
   ];
 
   return (
@@ -2629,7 +2863,7 @@ const IntroModal = ({ onClose }) => {
               <ChevronRight size={20}/>
             </button>
             <div style={{ fontSize: 14, color: MUTED, marginTop: 18 }}>
-              Raccourcis : <strong style={{ color: '#F8FAFC' }}>1-6</strong> naviguer · <strong style={{ color: '#F8FAFC' }}>←/→</strong> entre fiches · <strong style={{ color: '#F8FAFC' }}>i</strong> revoir l'intro
+              Raccourcis : <strong style={{ color: '#F8FAFC' }}>1-7</strong> naviguer · <strong style={{ color: '#F8FAFC' }}>←/→</strong> entre fiches · <strong style={{ color: '#F8FAFC' }}>i</strong> revoir l'intro
             </div>
           </div>
         </div>
@@ -2668,7 +2902,7 @@ const App = () => {
       if (showIntro) return;
       if (e.key.toLowerCase() === 'i') { setShowIntro(true); return; }
       const num = parseInt(e.key, 10);
-      if (num >= 1 && num <= 6) { goto(SCREENS[num-1].id); return; }
+      if (num >= 1 && num <= 7) { goto(SCREENS[num-1].id); return; }
       if (e.key === 'F11' || (e.ctrlKey && e.key.toLowerCase() === 'f')) {
         e.preventDefault();
         setPresentMode(p => !p);
@@ -2710,6 +2944,7 @@ const App = () => {
                                          preselectedCourseId={matrixCourseId} />}
         {screen === 'compare'       && <CompareScreen />}
         {screen === 'recognition'   && <RecognitionScreen />}
+        {screen === 'horizon'       && <HorizonScreen />}
       </div>
 
       {/* Footer */}
