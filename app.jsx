@@ -9,7 +9,8 @@ import {
   Euro, BadgeCheck, Globe, Rocket, GraduationCap,
   Flame, AlertTriangle, CheckCircle2, Laptop, Trophy, BookOpenCheck,
   Crown, Lightbulb, Scale, Gauge, ArrowRight,
-  Compass, Cpu, Leaf, Atom, Anchor
+  Compass, Cpu, Leaf, Atom, Anchor, Building2, FlaskConical, Factory, ShoppingCart,
+  Truck, Banknote, UsersRound, ServerCog
 } from 'lucide-react';
 
 /* ============================================================
@@ -979,7 +980,8 @@ const SCREENS = [
   { id: 'matrix',        label: 'Matière → Métiers', icon: BookOpen, shortcut: '4' },
   { id: 'compare',       label: 'Comparaison',   icon: GitCompare, shortcut: '5' },
   { id: 'recognition',   label: 'Diplôme',       icon: Award, shortcut: '6' },
-  { id: 'horizon',       label: 'Horizon',       icon: Compass, shortcut: '7' }
+  { id: 'horizon',       label: 'Horizon',       icon: Compass, shortcut: '7' },
+  { id: 'entreprise',    label: 'Entreprise',    icon: Building2, shortcut: '8' }
 ];
 
 const Navbar = ({ current, onChange, onTogglePresent, presentMode }) => (
@@ -2665,6 +2667,382 @@ const HorizonScreen = () => {
 };
 
 /* ============================================================
+   SCREEN 8 — ENTREPRISE (PharmaCorp, fictif)
+   ============================================================ */
+
+const PHARMA_STATS = [
+  { value: '3 500',  label: 'collaborateurs',     color: '#3B82F6' },
+  { value: '800 M€', label: 'CA annuel',          color: '#10B981' },
+  { value: '50+',    label: 'pays',               color: '#8B5CF6' },
+  { value: '350',    label: 'collaborateurs DSI', color: '#FF2891' }
+];
+
+const PHARMA_DIRS = [
+  { id: 'rd',  name: 'R&D',          icon: FlaskConical, color: '#06B6D4',
+    desc: 'Recherche de nouvelles molécules, essais cliniques, brevets. C\'est le moteur d\'innovation du laboratoire.',
+    headcount: '~900' },
+  { id: 'prod',name: 'Production',   icon: Factory,      color: '#F97316',
+    desc: 'Usines de fabrication des médicaments, contrôle qualité, conformité réglementaire (BPF, FDA).',
+    headcount: '~1100' },
+  { id: 'com', name: 'Commercial & Marketing', icon: ShoppingCart, color: '#EC4899',
+    desc: 'Force de vente médicale, promotion, accès au marché, prix et remboursement.',
+    headcount: '~600' },
+  { id: 'sc',  name: 'Supply Chain', icon: Truck,        color: '#10B981',
+    desc: 'Logistique mondiale, chaîne du froid, distribution, traçabilité des lots.',
+    headcount: '~250' },
+  { id: 'fin', name: 'Finance',      icon: Banknote,     color: '#F59E0B',
+    desc: 'Comptabilité, contrôle de gestion, audit, relations investisseurs.',
+    headcount: '~150' },
+  { id: 'rh',  name: 'Ressources Humaines', icon: UsersRound, color: '#8B5CF6',
+    desc: 'Recrutement, formation, paye, mobilité internationale, relations sociales.',
+    headcount: '~150' },
+  { id: 'dsi', name: 'DSI',          icon: ServerCog,    color: '#FF2891',
+    desc: 'Direction des Systèmes d\'Information. Le système nerveux numérique : sans elle, plus rien ne tourne.',
+    headcount: '350', isFocus: true }
+];
+
+const DSI_POLES = [
+  {
+    id: 'infra', name: 'Infrastructure & Cloud', icon: Cloud, color: '#10B981',
+    headcount: '~80',
+    pitch: "Les fondations techniques : serveurs, réseaux, cloud AWS/Azure, data centers. Sans eux, aucune application ne tourne.",
+    examples: [
+      "Migration de 200 applications historiques vers le cloud (économie 30 % d'infra/an)",
+      "Réseau international : 50 sites connectés en SD-WAN, latence <50 ms",
+      "Cloud hybride pour la R&D : capacité de calcul élastique pour les essais cliniques"
+    ],
+    jobIds: ['j17','j18','j20','j21']
+  },
+  {
+    id: 'data', name: 'Data & IA', icon: Brain, color: '#3B82F6',
+    headcount: '~70',
+    pitch: "L'or du laboratoire : valoriser les données cliniques, R&D, production pour accélérer la découverte de médicaments et personnaliser les traitements.",
+    examples: [
+      "IA de criblage : analyse 10 000 molécules par jour, identifie les candidats prometteurs en 1/10e du temps",
+      "Plateforme data unifiée : 50 To de données cliniques exploitables temps réel",
+      "ML pour la médecine personnalisée : prédire la réponse d'un patient au traitement"
+    ],
+    jobIds: ['j1','j2','j3','j4','j5','j6']
+  },
+  {
+    id: 'cyber', name: 'Cybersécurité', icon: Shield, color: '#F97316',
+    headcount: '~60',
+    pitch: "Le rempart : protège la R&D (brevets), les données patients (RGPD), la production (sabotage) et la marque (réputation).",
+    examples: [
+      "SOC 24/7 : surveille 1,5 milliard d'événements/jour, neutralise 200+ attaques/mois",
+      "Une fuite de données patients = jusqu'à 20 M€ d'amende RGPD + perte de confiance",
+      "Brevets molécules : un vol = des années de R&D à la concurrence (valeur ~500 M€)"
+    ],
+    jobIds: ['j11','j12','j13','j14','j15','j16','j19','j22']
+  },
+  {
+    id: 'dev', name: 'Développement & Applications', icon: Code, color: '#06B6D4',
+    headcount: '~60',
+    pitch: "Les bâtisseurs : conçoivent et maintiennent les applications métier (R&D, production, commercial, finance) qui font tourner l'entreprise.",
+    examples: [
+      "Portail visiteurs médicaux : 3 000 commerciaux équipés en mobilité",
+      "ERP pharmaceutique sur mesure : suivi de chaque lot du laboratoire à la pharmacie",
+      "Application essais cliniques : capture data multi-pays, conforme FDA"
+    ],
+    jobIds: ['j8','j9','j10']
+  },
+  {
+    id: 'pmo', name: 'Projets & Transformation', icon: Target, color: '#8B5CF6',
+    headcount: '~80',
+    pitch: "Les chefs d'orchestre : pilotent les grands programmes IT, alignent la tech sur la stratégie, accompagnent le changement humain.",
+    examples: [
+      "Programme transformation digitale 50 M€ sur 3 ans",
+      "DPO : conformité RGPD, registre des traitements, relations CNIL",
+      "Engineering Manager : recrute et fait grandir les équipes tech (350 personnes)"
+    ],
+    jobIds: ['j7','j23','j24','j25','j27']
+  }
+];
+
+const EntrepriseScreen = ({ onSelectJob }) => {
+  const [view, setView] = useState('org'); // 'org' | 'dsi' | 'pole'
+  const [selectedPoleId, setSelectedPoleId] = useState(null);
+
+  const selectedPole = DSI_POLES.find(p => p.id === selectedPoleId);
+
+  const goOrg  = () => setView('org');
+  const goDSI  = () => setView('dsi');
+  const goPole = (id) => { setSelectedPoleId(id); setView('pole'); };
+
+  return (
+    <div style={{ padding:'32px 48px', fontFamily: FONT, minHeight:'100vh' }}>
+      {/* Hero */}
+      <div style={{ textAlign:'center', marginBottom: 28 }}>
+        <h1 style={{ fontSize: 42, fontWeight: 900, margin: 0, color: C.fg, letterSpacing:'-0.02em', lineHeight: 1.15 }}>
+          À quoi ressemble une <span style={{ borderBottom: `4px solid ${C.pink}`, paddingBottom: 3 }}>vraie entreprise</span> ?
+        </h1>
+        <p style={{ fontSize: 20, color: C.fgDim, marginTop: 14, fontWeight: 500 }}>
+          Cas concret : <strong style={{ color: C.fg }}>PharmaCorp</strong>, laboratoire pharmaceutique <em style={{ color: C.muted }}>(fictif)</em>
+        </p>
+      </div>
+
+      {/* Breadcrumb */}
+      <div style={{
+        display:'flex', alignItems:'center', gap: 10,
+        marginBottom: 22, fontSize: 16, color: C.muted, fontFamily: FONT
+      }}>
+        <button onClick={goOrg}
+          style={{ background:'transparent', border:'none', color: view==='org' ? C.pink : C.fgDim,
+                   cursor:'pointer', fontWeight: view==='org'?800:600, fontSize: 16, fontFamily: FONT, padding: 0 }}>
+          🏢 Organigramme
+        </button>
+        {(view==='dsi' || view==='pole') && <>
+          <ChevronRight size={16} color={C.muted}/>
+          <button onClick={goDSI}
+            style={{ background:'transparent', border:'none', color: view==='dsi' ? C.pink : C.fgDim,
+                     cursor:'pointer', fontWeight: view==='dsi'?800:600, fontSize: 16, fontFamily: FONT, padding: 0 }}>
+            🖥 DSI — 5 pôles
+          </button>
+        </>}
+        {view==='pole' && selectedPole && <>
+          <ChevronRight size={16} color={C.muted}/>
+          <span style={{ color: C.pink, fontWeight: 800 }}>{selectedPole.name}</span>
+        </>}
+      </div>
+
+      {view === 'org'  && <OrgView stats={PHARMA_STATS} dirs={PHARMA_DIRS} onFocusDSI={goDSI}/>}
+      {view === 'dsi'  && <DSIView poles={DSI_POLES} onSelectPole={goPole}/>}
+      {view === 'pole' && selectedPole && <PoleView pole={selectedPole} onSelectJob={onSelectJob} onBack={goDSI}/>}
+    </div>
+  );
+};
+
+const OrgView = ({ stats, dirs, onFocusDSI }) => (
+  <>
+    {/* Stats */}
+    <div style={{ display:'flex', gap: 16, justifyContent:'center', flexWrap:'wrap', marginBottom: 32 }}>
+      {stats.map((s, i) => (
+        <div key={i} style={{
+          padding: '18px 28px', borderRadius: 10,
+          background: C.bgElev, border: `1px solid ${C.border}`,
+          borderLeft: `3px solid ${s.color}`, minWidth: 180, textAlign:'center'
+        }}>
+          <div style={{ fontSize: 32, fontWeight: 900, color: s.color, letterSpacing:'-0.02em', lineHeight: 1 }}>{s.value}</div>
+          <div style={{ fontSize: 15, color: C.fgDim, marginTop: 8, fontWeight: 600 }}>{s.label}</div>
+        </div>
+      ))}
+    </div>
+
+    {/* Org chart — CEO + 7 directions */}
+    <div style={{ maxWidth: 1080, margin: '0 auto' }}>
+      <div style={{ textAlign:'center', marginBottom: 24 }}>
+        <div style={{
+          display:'inline-flex', alignItems:'center', gap: 14,
+          padding:'18px 36px', borderRadius: 12,
+          background: `linear-gradient(135deg, ${C.pink}, ${C.cyan})`,
+          color:'#fff', fontWeight: 800, fontSize: 22,
+          boxShadow: `0 8px 28px ${C.pink}55`
+        }}>
+          <Crown size={26}/> Direction Générale (CEO)
+        </div>
+      </div>
+
+      <div style={{
+        height: 28, width: 2, background: C.border, margin: '0 auto 0 auto'
+      }}/>
+
+      <div style={{
+        display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(260px, 1fr))',
+        gap: 16, marginTop: 20
+      }}>
+        {dirs.map(d => {
+          const Icon = d.icon;
+          const isFocus = d.isFocus;
+          return (
+            <div key={d.id}
+              onClick={isFocus ? onFocusDSI : undefined}
+              style={{
+                padding: 22, borderRadius: 12,
+                background: isFocus ? `${d.color}1A` : C.bgElev,
+                border: `1px solid ${isFocus ? d.color : C.border}`,
+                borderLeft: `4px solid ${d.color}`,
+                cursor: isFocus ? 'pointer' : 'default',
+                transition: 'all 200ms',
+                position:'relative'
+              }}
+              onMouseEnter={(e) => { if (isFocus) { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = `0 10px 28px ${d.color}33`; } }}
+              onMouseLeave={(e) => { if (isFocus) { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = 'none'; } }}
+            >
+              <div style={{ display:'flex', alignItems:'center', gap: 12, marginBottom: 10 }}>
+                <div style={{
+                  width: 44, height: 44, borderRadius: 10,
+                  background: `${d.color}26`, color: d.color,
+                  display:'flex', alignItems:'center', justifyContent:'center', flexShrink: 0
+                }}>
+                  <Icon size={24}/>
+                </div>
+                <div>
+                  <div style={{ fontSize: 19, fontWeight: 800, color: C.fg }}>{d.name}</div>
+                  <div style={{ fontSize: 14, color: C.muted }}>{d.headcount} personnes</div>
+                </div>
+                {isFocus && <div style={{
+                  marginLeft:'auto', padding:'4px 10px', borderRadius: 999,
+                  background: d.color, color:'#fff', fontSize: 12, fontWeight: 800,
+                  letterSpacing:'0.08em', textTransform:'uppercase'
+                }}>Cliquez →</div>}
+              </div>
+              <div style={{ fontSize: 15, color: C.fgDim, lineHeight: 1.5 }}>{d.desc}</div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+
+    <div style={{ textAlign:'center', marginTop: 32, color: C.muted, fontSize: 14 }}>
+      💡 Cliquez sur la <strong style={{ color: C.pink }}>DSI</strong> pour zoomer sur les 5 pôles IT — c'est là que vous travaillerez.
+    </div>
+  </>
+);
+
+const DSIView = ({ poles, onSelectPole }) => (
+  <>
+    <div style={{ textAlign:'center', marginBottom: 24 }}>
+      <h2 style={{ fontSize: 28, fontWeight: 800, color: C.fg, margin: 0, letterSpacing:'-0.01em' }}>
+        DSI — <span style={{ color: C.pink }}>350 personnes</span>, 5 pôles
+      </h2>
+      <p style={{ fontSize: 17, color: C.fgDim, marginTop: 10 }}>
+        Cliquez sur un pôle pour voir les métiers qu'on y trouve.
+      </p>
+    </div>
+
+    <div style={{
+      display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(320px, 1fr))',
+      gap: 18, maxWidth: 1200, margin: '0 auto'
+    }}>
+      {poles.map(p => {
+        const Icon = p.icon;
+        return (
+          <div key={p.id}
+            onClick={() => onSelectPole(p.id)}
+            style={{
+              padding: 24, borderRadius: 12,
+              background: C.bgElev, border: `1px solid ${C.border}`,
+              borderLeft: `4px solid ${p.color}`,
+              cursor:'pointer', transition: 'all 200ms',
+              display:'flex', flexDirection:'column', gap: 14
+            }}
+            onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = `0 10px 28px ${p.color}33`; e.currentTarget.style.borderColor = p.color; }}
+            onMouseLeave={(e) => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = 'none'; e.currentTarget.style.borderColor = C.border; }}
+          >
+            <div style={{ display:'flex', alignItems:'center', gap: 14 }}>
+              <div style={{
+                width: 52, height: 52, borderRadius: 12,
+                background: `${p.color}26`, color: p.color,
+                display:'flex', alignItems:'center', justifyContent:'center', flexShrink: 0
+              }}>
+                <Icon size={28}/>
+              </div>
+              <div>
+                <div style={{ fontSize: 22, fontWeight: 800, color: C.fg, lineHeight: 1.2 }}>{p.name}</div>
+                <div style={{ fontSize: 14, color: C.muted, marginTop: 2 }}>{p.headcount} · {p.jobIds.length} métiers</div>
+              </div>
+            </div>
+            <div style={{ fontSize: 16, color: C.fgDim, lineHeight: 1.5 }}>{p.pitch}</div>
+            <div style={{
+              fontSize: 14, color: p.color, fontWeight: 700, marginTop: 'auto',
+              display:'flex', alignItems:'center', gap: 6
+            }}>
+              Voir les métiers <ArrowRight size={16}/>
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  </>
+);
+
+const PoleView = ({ pole, onSelectJob, onBack }) => {
+  const Icon = pole.icon;
+  const jobs = pole.jobIds.map(id => JOB_BY_ID[id]).filter(Boolean);
+  return (
+    <>
+      <Card hover={false} style={{ maxWidth: 1080, margin: '0 auto 24px auto', borderLeft: `4px solid ${pole.color}` }}>
+        <div style={{ display:'flex', alignItems:'flex-start', gap: 18, marginBottom: 18 }}>
+          <div style={{
+            width: 64, height: 64, borderRadius: 14,
+            background: `${pole.color}26`, color: pole.color,
+            display:'flex', alignItems:'center', justifyContent:'center', flexShrink: 0
+          }}>
+            <Icon size={36}/>
+          </div>
+          <div>
+            <div style={{ fontSize: 28, fontWeight: 800, color: C.fg, letterSpacing:'-0.01em' }}>{pole.name}</div>
+            <div style={{ fontSize: 15, color: C.muted, marginTop: 4 }}>{pole.headcount} personnes · {jobs.length} métiers présentés</div>
+          </div>
+        </div>
+        <p style={{ fontSize: 18, color: C.fgDim, lineHeight: 1.6, margin: 0 }}>{pole.pitch}</p>
+      </Card>
+
+      <Card hover={false} style={{ maxWidth: 1080, margin: '0 auto 24px auto' }}>
+        <SectionTitle icon={Lightbulb} color={pole.color}>Exemples concrets chez PharmaCorp</SectionTitle>
+        <div style={{ display:'flex', flexDirection:'column', gap: 12 }}>
+          {pole.examples.map((ex, i) => (
+            <div key={i} style={{
+              padding: 14, borderRadius: 8,
+              background: C.bgDeep, borderLeft: `3px solid ${pole.color}`,
+              fontSize: 17, color: C.fg, lineHeight: 1.5
+            }}>{ex}</div>
+          ))}
+        </div>
+      </Card>
+
+      <Card hover={false} style={{ maxWidth: 1080, margin: '0 auto 24px auto' }}>
+        <SectionTitle icon={Briefcase} color={pole.color}>Métiers présents dans ce pôle</SectionTitle>
+        <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill,minmax(280px,1fr))', gap: 12 }}>
+          {jobs.map(j => {
+            const fam = FAMILIES[j.family];
+            const FamIcon = fam.icon;
+            return (
+              <button key={j.id} onClick={() => onSelectJob(j.id)}
+                style={{
+                  padding: 14, borderRadius: 10,
+                  background: C.bgDeep, border: `1px solid ${C.border}`,
+                  borderLeft: `3px solid ${jobTitleColor(j)}`,
+                  textAlign:'left', cursor:'pointer', fontFamily: FONT,
+                  display:'flex', flexDirection:'column', gap: 8,
+                  transition: 'all 150ms'
+                }}
+                onMouseEnter={(e) => { e.currentTarget.style.borderColor = pole.color; e.currentTarget.style.transform = 'translateY(-1px)'; }}
+                onMouseLeave={(e) => { e.currentTarget.style.borderColor = C.border; e.currentTarget.style.transform = 'translateY(0)'; }}
+              >
+                <div style={{ display:'flex', alignItems:'center', gap: 8 }}>
+                  <FamIcon size={16} color={fam.color}/>
+                  <div style={{ fontSize: 12, fontWeight: 700, color: fam.color, letterSpacing:'0.04em', textTransform:'uppercase' }}>
+                    {fam.label}
+                  </div>
+                </div>
+                <div style={{ fontSize: 17, fontWeight: 700, color: C.fg, lineHeight: 1.25 }}>{j.name}</div>
+                <div style={{ display:'flex', alignItems:'center', gap: 10, fontSize: 14, color: C.fgDim }}>
+                  <span style={{ color: C.success, fontWeight: 800 }}>{j.salary.senior}k€</span>
+                  <TensionBadge tension={j.market_tension}/>
+                </div>
+              </button>
+            );
+          })}
+        </div>
+      </Card>
+
+      <div style={{ textAlign:'center' }}>
+        <button onClick={onBack}
+          style={{
+            padding:'12px 22px', borderRadius: 10,
+            background: C.bgElev, border: `1px solid ${C.border}`,
+            color: C.fg, cursor:'pointer', fontSize: 16, fontWeight: 600, fontFamily: FONT,
+            display:'inline-flex', alignItems:'center', gap: 8
+          }}>
+          <ChevronLeft size={18}/> Retour aux 5 pôles DSI
+        </button>
+      </div>
+    </>
+  );
+};
+
+/* ============================================================
    INTRO MODAL — first-load overview popup
    ============================================================ */
 
@@ -2702,7 +3080,8 @@ const IntroModal = ({ onClose }) => {
     { icon: BookOpen,   title: 'Matière → Métiers',   desc: 'Comment les cours préparent chaque métier', accent: CYAN },
     { icon: GitCompare, title: 'Comparaison',         desc: '2-3 métiers côte à côte',                   accent: PINK },
     { icon: Award,      title: 'Reconnaissance',      desc: 'Votre Bac+5 reconnu en Europe',             accent: CYAN },
-    { icon: Compass,    title: 'Horizon',             desc: 'Quantique, IA, Afrique, clouds souverains', accent: PINK }
+    { icon: Compass,    title: 'Horizon',             desc: 'Quantique, IA, Afrique, clouds souverains', accent: PINK },
+    { icon: Building2,  title: 'Entreprise',          desc: 'Cas concret PharmaCorp · zoom DSI',         accent: CYAN }
   ];
 
   return (
@@ -2897,7 +3276,7 @@ const IntroModal = ({ onClose }) => {
               <ChevronRight size={20}/>
             </button>
             <div style={{ fontSize: 14, color: MUTED, marginTop: 18 }}>
-              Raccourcis : <strong style={{ color: '#F8FAFC' }}>1-7</strong> naviguer · <strong style={{ color: '#F8FAFC' }}>←/→</strong> entre fiches · <strong style={{ color: '#F8FAFC' }}>i</strong> revoir l'intro
+              Raccourcis : <strong style={{ color: '#F8FAFC' }}>1-8</strong> naviguer · <strong style={{ color: '#F8FAFC' }}>←/→</strong> entre fiches · <strong style={{ color: '#F8FAFC' }}>i</strong> revoir l'intro
             </div>
           </div>
         </div>
@@ -2936,7 +3315,7 @@ const App = () => {
       if (showIntro) return;
       if (e.key.toLowerCase() === 'i') { setShowIntro(true); return; }
       const num = parseInt(e.key, 10);
-      if (num >= 1 && num <= 7) { goto(SCREENS[num-1].id); return; }
+      if (num >= 1 && num <= 8) { goto(SCREENS[num-1].id); return; }
       if (e.key === 'F11' || (e.ctrlKey && e.key.toLowerCase() === 'f')) {
         e.preventDefault();
         setPresentMode(p => !p);
@@ -2979,6 +3358,7 @@ const App = () => {
         {screen === 'compare'       && <CompareScreen />}
         {screen === 'recognition'   && <RecognitionScreen />}
         {screen === 'horizon'       && <HorizonScreen />}
+        {screen === 'entreprise'    && <EntrepriseScreen onSelectJob={selectJob} />}
       </div>
 
       {/* Footer */}
