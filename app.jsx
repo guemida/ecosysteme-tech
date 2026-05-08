@@ -18,7 +18,7 @@ import {
    ============================================================ */
 
 import { C, FONT } from './theme.js';
-import { TITLES, FAMILIES, TENSION } from './data/taxonomy.js';
+import { FAMILIES, TENSION } from './data/taxonomy.js';
 import { SOFTSKILLS, SS_BY_ID } from './data/softskills.js';
 import { COURSES, COURSE_BY_ID } from './data/courses.js';
 import { JOBS, JOB_BY_ID } from './data/jobs.js';
@@ -332,7 +332,7 @@ const Navbar = ({ current, onChange, onTogglePresent, presentMode }) => (
 
     <button
       onClick={onTogglePresent}
-      title="Mode présentation (F11 ou Ctrl+F)"
+      title="Mode présentation (Ctrl+Shift+P)"
       style={{
         display:'flex', alignItems:'center', gap: 8,
         padding: '10px 18px', borderRadius: 8,
@@ -381,6 +381,7 @@ const ConstellationScreen = ({ onSelectJob }) => {
   const wrapRef = useRef(null);
   const [filter, setFilter] = useState('all'); // all | t1 | t2 | trans
   const [paused, setPaused] = useState(false);
+  const [graphWidth, setGraphWidth] = useState(0);
   const simRef = useRef(null);
 
   const filterMatch = (d) => {
@@ -394,9 +395,29 @@ const ConstellationScreen = ({ onSelectJob }) => {
   };
 
   useEffect(() => {
-    if (!svgRef.current || !wrapRef.current) return;
+    if (!wrapRef.current) return;
 
-    const width = wrapRef.current.clientWidth;
+    const updateWidth = () => {
+      const nextWidth = wrapRef.current?.clientWidth || 0;
+      setGraphWidth((prev) => (prev === nextWidth ? prev : nextWidth));
+    };
+
+    updateWidth();
+
+    if (typeof ResizeObserver === 'function') {
+      const observer = new ResizeObserver(updateWidth);
+      observer.observe(wrapRef.current);
+      return () => observer.disconnect();
+    }
+
+    window.addEventListener('resize', updateWidth);
+    return () => window.removeEventListener('resize', updateWidth);
+  }, []);
+
+  useEffect(() => {
+    if (!svgRef.current || !wrapRef.current || !graphWidth) return;
+
+    const width = graphWidth;
     const height = 620;
 
     const svg = d3.select(svgRef.current);
@@ -543,7 +564,7 @@ const ConstellationScreen = ({ onSelectJob }) => {
     });
 
     return () => { sim.stop(); tip.remove(); };
-  }, [filter]);
+  }, [filter, graphWidth, onSelectJob]);
 
   useEffect(() => {
     if (!simRef.current) return;
@@ -1199,7 +1220,9 @@ const TabCareer = ({ job, onSelectJob }) => {
                     <div style={{ fontSize: 24, fontWeight: 800, color: C.success, letterSpacing:'-0.02em' }}>
                       {c.salary_median}k€
                     </div>
-                    <Badge color={C.success}>Facile</Badge>
+                    <Badge color={c.ease === 'orange' ? C.warn : c.ease === 'rouge' ? C.danger : C.success}>
+                      {c.ease === 'orange' ? 'Moyenne' : c.ease === 'rouge' ? 'Complexe' : 'Facile'}
+                    </Badge>
                   </div>
                 </div>
               );
@@ -2462,7 +2485,7 @@ const IntroModal = ({ onClose }) => {
               <ChevronRight size={20}/>
             </button>
             <div style={{ fontSize: 14, color: MUTED, marginTop: 18 }}>
-              Raccourcis : <strong style={{ color: '#F8FAFC' }}>1-8</strong> naviguer · <strong style={{ color: '#F8FAFC' }}>←/→</strong> entre fiches · <strong style={{ color: '#F8FAFC' }}>i</strong> revoir l'intro
+              Raccourcis : <strong style={{ color: '#F8FAFC' }}>1-8</strong> naviguer · <strong style={{ color: '#F8FAFC' }}>←/→</strong> entre fiches · <strong style={{ color: '#F8FAFC' }}>Ctrl+Shift+P</strong> présentation · <strong style={{ color: '#F8FAFC' }}>i</strong> revoir l'intro
             </div>
           </div>
         </div>
@@ -2480,7 +2503,6 @@ const App = () => {
   const [selectedJobId, setSelectedJobId] = useState('j1');
   const [presentMode, setPresentMode] = useState(false);
   const [fadeKey, setFadeKey] = useState(0);
-  const [matrixCourseId, setMatrixCourseId] = useState(null);
   const [showIntro, setShowIntro] = useState(true);
 
   const goto = (id) => { setScreen(id); setFadeKey(k => k+1); };
@@ -2502,7 +2524,7 @@ const App = () => {
       if (e.key.toLowerCase() === 'i') { setShowIntro(true); return; }
       const num = parseInt(e.key, 10);
       if (num >= 1 && num <= 8) { goto(SCREENS[num-1].id); return; }
-      if (e.key === 'F11' || (e.ctrlKey && e.key.toLowerCase() === 'f')) {
+      if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === 'p') {
         e.preventDefault();
         setPresentMode(p => !p);
         return;
@@ -2539,8 +2561,7 @@ const App = () => {
         {screen === 'detail'        && <JobDetailScreen jobId={selectedJobId}
                                          onSelectJob={selectJob}
                                          onNavigate={navigateJob} />}
-        {screen === 'matrix'        && <MatrixScreen onSelectJob={selectJob}
-                                         preselectedCourseId={matrixCourseId} />}
+        {screen === 'matrix'        && <MatrixScreen onSelectJob={selectJob} />}
         {screen === 'compare'       && <CompareScreen />}
         {screen === 'recognition'   && <RecognitionScreen />}
         {screen === 'horizon'       && <HorizonScreen />}

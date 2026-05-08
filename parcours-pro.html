@@ -285,6 +285,8 @@
     const LEVEL_LABELS     = ['—', 'Notion', 'Pratique', 'Expert'];
     const LEVEL_REQ_LABELS = ['', 'Notion', 'Pratique', 'Expert'];
     const SS_KEY = 'parcours-pro-state-v2';
+    let galaxySimulation = null;
+    let galaxyResizeHandler = null;
 
     /* ─── état + persistance ─── */
     const state = {
@@ -301,6 +303,17 @@
         const raw = sessionStorage.getItem(SS_KEY);
         if (raw) Object.assign(state, JSON.parse(raw));
       } catch {}
+    }
+
+    function cleanupGalaxy() {
+      if (galaxySimulation) {
+        galaxySimulation.stop();
+        galaxySimulation = null;
+      }
+      if (galaxyResizeHandler) {
+        window.removeEventListener('resize', galaxyResizeHandler);
+        galaxyResizeHandler = null;
+      }
     }
 
     /* ─── helpers ─── */
@@ -354,6 +367,8 @@
       const wrap = document.getElementById('galaxy-wrap');
       const svgEl = document.getElementById('galaxy-svg');
       if (!wrap || !svgEl) return;
+
+      cleanupGalaxy();
 
       const width  = wrap.clientWidth;
       const height = 520;
@@ -432,7 +447,7 @@
 
       nodeG.transition().delay((d, i) => i * 60).duration(450).style('opacity', 1);
 
-      d3.forceSimulation(jobs)
+      galaxySimulation = d3.forceSimulation(jobs)
         .force('link',      d3.forceLink(links).id(d => d.id).distance(120).strength(0.18))
         .force('charge',    d3.forceManyBody().strength(-340))
         .force('center',    d3.forceCenter(width / 2, height / 2))
@@ -450,6 +465,9 @@
                .attr('x2', d => d.target.x).attr('y2', d => d.target.y);
           nodeG.attr('transform', d => `translate(${d.x},${d.y})`);
         });
+
+      galaxyResizeHandler = () => initGalaxy();
+      window.addEventListener('resize', galaxyResizeHandler);
     }
 
     function attachGalaxyHandlers() {
@@ -623,6 +641,19 @@
             .map(s => `<span class="parcours-acquired-chip">${escHtml(s.name)}</span>`)
             .join('');
 
+      const uncoveredHtml = result.uncoveredSkills.length === 0
+        ? ''
+        : `
+          <div class="parcours-acquired" style="border-left-color: var(--warn); margin-top: 24px;">
+            <h3 style="color: var(--warn);">Compétences non couvertes directement (${result.uncoveredSkills.length})</h3>
+            <p class="parcours-acquired-empty" style="font-style: normal; color: var(--fg-dim); margin-bottom: 12px;">
+              Le cursus ne couvre pas explicitement ces compétences dans le mapping actuel. Elles devront être complétées via projet, veille, autoformation ou expérience terrain.
+            </p>
+            <div class="parcours-acquired-list">
+              ${result.uncoveredSkills.map(s => `<span class="parcours-acquired-chip" style="background: rgba(245,158,11,0.12); border-color: rgba(245,158,11,0.4); color: var(--warn);">${escHtml(s.name)}</span>`).join('')}
+            </div>
+          </div>`;
+
       return `
         <section class="screen-parcours">
           <header class="hdr">
@@ -649,6 +680,8 @@
             <div class="parcours-acquired-list">${acquiredHtml}</div>
           </div>
 
+          ${uncoveredHtml}
+
           <div class="actions">
             <button class="btn btn-secondary" id="btn-back-bilan-2">← Retour au bilan</button>
             <button class="btn btn-primary" id="btn-back-galaxy">Choisir un autre métier</button>
@@ -668,8 +701,16 @@
     const HANDLERS  = { galaxy: attachGalaxyHandlers, bilan: attachBilanHandlers, parcours: attachParcoursHandlers };
 
     function render() {
+      cleanupGalaxy();
+
       // self-correction : bilan/parcours sans selectedJobId → galaxie
       if (state.screen !== 'galaxy' && !state.selectedJobId) state.screen = 'galaxy';
+      if (state.selectedJobId && (!JOB_BY_ID[state.selectedJobId] || !PERIMETER.includes(state.selectedJobId))) {
+        state.selectedJobId = null;
+        state.screen = 'galaxy';
+        state.userLevels = {};
+        saveState();
+      }
       if (!RENDERERS[state.screen]) state.screen = 'galaxy';
 
       document.getElementById('app').innerHTML = RENDERERS[state.screen]();
